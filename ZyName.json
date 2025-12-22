@@ -1,0 +1,16 @@
+{
+	"S_ChannelSwitcher" : "S_通道切换器",
+	"S_ClampChroma" : "S_色度钳制",  
+	"S_DuoTone" : "S_双色调",
+	"S_Gamma" : "S_伽马",
+	"S_Hotspots" : "S_热点",
+	"S_HueSatBright" : "S_色相饱和度亮度",
+	"S_Invert" : "S_反转",
+	"S_Monochrome" : "S_单色",
+	"S_OCIOTransform" : "S_OCIO变换",
+	"S_QuadTone" : "S_四色调",
+	"S_ShowBadColors" : "S_异常颜色",
+	"S_Threshold" : "S_阈值",
+	"S_Tint" : "S_色调",
+	"S_TriTone" : "S_三色调",
+}
