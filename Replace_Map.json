@@ -3296,7 +3296,7 @@
 	"TYPE OFF REMOVE": "打字机消失",
 	"Remove Time": "消失时间",
 	"Remove Order": "消失顺序",
-	"Effect Presets & Docs": "效果预设与文档",
+	"Effect Presets & Docs": "杂鱼汉化-淚泪泪",
 	"Compare Mode": "对比模式",
 	"Host Layer": "宿主图层",
 	"Enabled": "启用",
@@ -8147,5 +8147,10 @@
 	"Wave Angle": "波纹角度",
 	"Peak Point": "峰值点",
 	"Decay Distance": "衰减距离",
-	"Decay": "衰减强度"
+	"Decay": "衰减强度",
+	"FX EDITOR" : "特效编辑器",
+	"LICENSE" : "许可证",
+	"Select File..." : "选择文件...",
+	"Select Folder..." : "选择文件夹...",
+	"Current Style" : "当前样式"
 }
