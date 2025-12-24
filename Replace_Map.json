@@ -3237,7 +3237,8 @@
 	"Triangles" : "三角形",
 	"Diamonds" : "菱形",
 	"Stars" : "星形",
-	"No: Use Wipe%" : "否：使用擦除百分比",
+	"No: use Wipe%" : "否：使用擦除百分比",
 	"Yes: ignore  Wipe%" : "是：忽略擦除百分比"
 }
+
 
