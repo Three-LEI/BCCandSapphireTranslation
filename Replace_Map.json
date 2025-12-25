@@ -8338,13 +8338,14 @@
 	"Max to Current Value" : "从最大值到当前数值",
 	"Current Value to Min" : "从当前数值到最小值",
 	"Min to Current Value" : "从最小值到当前数值",
-	"Unused(Immediate)" : "未使用（即时生效）",
+	"Unused (Immediate)" : "未使用（即时生效）",
 	"Quadratic Hard" : "二次方强衰减",
-	"Quadratic Soft" : "二次方弱衰减",
+	"Quadradic Soft" : "二次方弱衰减",
 	"Sustain" : "持续",
 	"Build Up to Max" : "递增至最大值",
 	"Build Up Indefinitely" : "无限递增",
 	"Box Percentage" : "方框百分比",
 	"Max Frequency" : "最大频率",
-	"Toggle ON/OFF" : "开关切换"
+	"Toggle ON/OFF" : "开关切换",
+	"Link to Sampler from Apply Options A" : "从应用选项A链接至采样器"
 }
