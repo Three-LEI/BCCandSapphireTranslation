@@ -8284,14 +8284,14 @@
 	"Compare with Below" : "与下方图层对比",
 	"Compare with Layer" : "与指定图层对比",
 	"Custom" : "自定义",
-	"Border 4" : "4像素边框",
-	"Border 5" : "5像素边框",
-	"Border 6" : "6像素边框",
-	"Border 7" : "7像素边框",
-	"Border 8" : "8像素边框",
-	"Border 9" : "9像素边框",
-	"Border 10" : "10像素边框",
-	"Border 11" : "11像素边框",
+	"Border 4" : "边框4",
+	"Border 5" : "边框5",
+	"Border 6" : "边框6",
+	"Border 7" : "边框7",
+	"Border 8" : "边框8",
+	"Border 9" : "边框9",
+	"Border 10" : "边框10",
+	"Border 11" : "边框11",
 	"0 Degrees" : "0度",
 	"90 Degrees" : "90度",
 	"180 Degrees" : "180度",
@@ -10227,5 +10227,3 @@
 	"Twirl Center X" : "扭曲中心X",
 	"Twirl Center Y" : "扭曲中心Y"
 }
-
-
