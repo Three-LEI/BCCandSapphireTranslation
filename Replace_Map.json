@@ -5984,7 +5984,7 @@
 	"Light Source End": "光源结束位置",
 	"Source Point Animation": "源点动画",
 	"Shimmer Type": "微光类型",
-	"Ease": "过渡曲线",
+	"Ease": "缓动",
 	"Create Rays From": "从...生成射线",
 	"Ray Center": "射线中心",
 	"Composite on Original": "合成到原素材",
@@ -11767,4 +11767,3 @@
 	"Paste": "粘贴",
 	"Value": "值"
 }
-
