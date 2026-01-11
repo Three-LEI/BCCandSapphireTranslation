@@ -11743,5 +11743,7 @@
 	"Twixtored Output": "补帧处理输出",
 	"Use Embedded": "使用内置",
 	"Use GPU": "使用 GPU",
-	"Warping": "变形"
+	"Warping": "变形",
+	"360 Video" : "360 视频",
+	"Smart Blend" : "智能混合",
 }
