@@ -3439,7 +3439,7 @@
 	"Blue Mix": "蓝色混合量",
 	"Magenta Color": "品红色",
 	"Magenta Mix": "品红混合量",
-	"Yellow": "黄色",
+	"Yellow": "黄",
 	"Yellow Color": "黄色",
 	"Yellow Mix": "黄色混合量",
 	"Cyan": "青色",
@@ -11996,5 +11996,9 @@
 	"Tree-Cutting.jpg" : "木材切面纹.jpg",
 	"Weathered-Boards.jpg" : "饱经风霜木板纹.jpg",
 	"White-Boards.jpg" : "白色木板纹.jpg",
-	"Wicker-Art.jpg" : "编织工艺纹.jpg"
+	"Wicker-Art.jpg" : "编织工艺纹.jpg",
+	"Element" : "元素",
+	"Prefer Darker" : "偏好更深色",
+	"Prefer Lighter" : "偏好更浅色",
+	"Boost Eq Power-" : "增强均衡器功率-"
 }
