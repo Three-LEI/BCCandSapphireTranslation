@@ -2177,9 +2177,9 @@
 	"Color Stripes Amplitude": "彩色条纹幅度",
 	"Fast Forward Amount": "快进量",
 	"Tape Dropout Brightness": "磁带丢失亮度",
-	"Static": "静电",
-	"Static Amplitude": "静电幅度",
-	"Static Density": "静电密度",
+	"Static": "静态",
+	"Static Amplitude": "静态振幅",
+	"Static Density": "静态密度",
 	"Interference Details": "干扰细节",
 	"Dots Speed X": "点速度X",
 	"Dots Speed Y": "点速度Y",
@@ -7354,7 +7354,7 @@
 	"Degraded Color": "色彩劣化",
 	"Degraded Amount": "劣化强度",
 	"Degraded To": "劣化目标色",
-	"Color Gun Offset": "电子枪偏移",
+	"Color Gun Offset": "色彩偏移",
 	"Red Offset": "红色偏移",
 	"Green Offset": "绿色偏移",
 	"Blue Offset": "蓝色偏移",
@@ -12083,5 +12083,10 @@
 	"Bake inside layer bounds" : "在图层范围内烘焙",
 	"P a t h    W e i g h t    M a p": "        路 径 权 重 图",
 	"Tangents": "切线",
-	"M e t h o d" : "  方  法"
+	"M e t h o d" : "  方  法",
+	"Set Color" : "设置颜色",
+	"Kaleido Triangles" : "万花筒三角形",
+	"Kaleido Squares" : "万花筒方形",
+	"Kaleido Diamonds" : "万花筒菱形",
+	"Kaleido Oct" : "万花筒八边形"
 }
