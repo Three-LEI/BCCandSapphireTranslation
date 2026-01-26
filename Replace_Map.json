@@ -12088,5 +12088,10 @@
 	"Kaleido Triangles" : "万花筒三角形",
 	"Kaleido Squares" : "万花筒方形",
 	"Kaleido Diamonds" : "万花筒菱形",
-	"Kaleido Oct" : "万花筒八边形"
+	"Kaleido Oct" : "万花筒八边形",
+	"Classic" : "经典",
+	"Normalize" : "规范化",
+	"Presets:" : "预设",
+	"Bump" : "凸起",
+	"Robotic" : "机械式"
 }
