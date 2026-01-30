@@ -622,7 +622,7 @@ function Zayu_OpenEditorWindow() {
     var countP = 0; for(var k in MasterDataParam) countP++;
 
     // ================= UI 构建 =================
-    var win = new Window("palette", "杂鱼-自定义汉化字典编辑器", undefined, {resizeable: true}); 
+    var win = new Window("palette", "杂鱼-自定义汉化字典编辑器", undefined, {resizeable: false}); 
         win.orientation = "column"; 
         win.alignChildren = ["fill","top"]; 
         win.preferredSize = [600, 700];
