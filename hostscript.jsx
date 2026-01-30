@@ -300,6 +300,7 @@ function Zayu_ShowCustomDictWindow() {
             return;
         }
 
+        // 创建进度窗口
         var progWin = new Window("palette", "正在处理...", undefined, {closeButton: false}); 
             progWin.preferredSize = [400, 100];
             progWin.alignChildren = ["fill", "center"];
@@ -308,16 +309,24 @@ function Zayu_ShowCustomDictWindow() {
             progBar.preferredSize.height = 20;
         
         progWin.show();
-        progWin.update(); 
+        progWin.update(); // 强制刷新 UI
 
+        // 结果变量
+        var resultMsg = null;
+
+        // 使用 try-catch 确保即使出错窗口也能关闭
         try {
+            // 定义读取函数
             var loadWithProgress = function(path, percent) {
                 progBar.value = percent;
                 stStatus.text = "正在读取: " + new File(path).name;
                 progWin.update(); 
+                // 稍微给 UI 线程一点喘息时间，防止白屏
+                $.sleep(10); 
                 return readJsonFile(path);
             };
 
+            // 模拟进度
             var zyNameDict = loadWithProgress(OFFICIAL_NAME_DICT, 10);
             var customNameDict = loadWithProgress(FILE_NAME_DICT, 30);
             var replaceMapDict = loadWithProgress(OFFICIAL_PARAM_DICT, 50);
@@ -326,31 +335,45 @@ function Zayu_ShowCustomDictWindow() {
             stStatus.text = "正在比对过滤...";
             progBar.value = 90;
             progWin.update();
+            $.sleep(10);
 
+            // 定义过滤逻辑 (保持原有逻辑不变)
             var filterContentSync = function(keyStr, valStr, dict1, dict2) {
                 if (!keyStr) return { keys: "", vals: "", removed: 0, remain: 0 };
                 var kLines = keyStr.split("\n");
-                var vLines = (valStr) ? valStr.split("\n") : [];
+                // 翻译框如果没有内容，就当做全是空行
+                var vLines = (valStr && valStr.replace(/\s/g, "") !== "") ? valStr.split("\n") : [];
+                
                 var resK = [], resV = [], removedCount = 0;
 
                 for (var i = 0; i < kLines.length; i++) {
                     var lineKey = kLines[i];
                     if (!lineKey || lineKey.replace(/\s/g, "") === "") continue;
-                    var key = cleanKey(lineKey);
                     
-                    if (dict1.hasOwnProperty(key) || dict2.hasOwnProperty(key)) {
+                    var key = cleanKey(lineKey); // 提取纯Key
+                    
+                    // 如果在官方字典 或 自定义字典中已存在
+                    if ((dict1 && dict1.hasOwnProperty(key)) || (dict2 && dict2.hasOwnProperty(key))) {
                         removedCount++;
                     } else {
                         resK.push(lineKey);
+                        // 对应的翻译行，如果有就保留，没有就空
                         resV.push(vLines[i] || ""); 
                     }
                 }
-                return { keys: resK.join("\n"), vals: resV.join("\n"), removed: removedCount, remain: resK.length };
+                return { 
+                    keys: resK.join("\n"), 
+                    vals: resV.join("\n"), 
+                    removed: removedCount, 
+                    remain: resK.length 
+                };
             };
 
+            // 执行过滤
             var resName = filterContentSync(NameOriginalTextEditingBox.text, NameTranslationEditBox.text, zyNameDict, customNameDict);
             var resParam = filterContentSync(ParameterTextEditingBox.text, ParameterTranslationEditBox.text, replaceMapDict, customParamDict);
 
+            // 更新 UI
             if(!isNameEmpty) {
                 NameOriginalTextEditingBox.text = resName.keys;
                 NameTranslationEditBox.text = resName.vals;
@@ -362,20 +385,28 @@ function Zayu_ShowCustomDictWindow() {
                 OriginalParameterTitleText.text = "原文 (Key) - [" + resParam.remain + "项]";
             }
 
-            var resultMsg = "去重完成！\n插件名移除: " + resName.removed + "\n参数名移除: " + resParam.removed;
-            $.global.tempResultMsg = resultMsg; 
+            // 准备结果文本
+            resultMsg = "去重完成！\n插件名移除: " + resName.removed + "\n参数名移除: " + resParam.removed;
 
         } catch(err) {
-            alert("发生错误：" + err.toString());
+            resultMsg = "发生错误：" + err.toString();
         } finally {
+            // 【关键修改】在这里关闭窗口
             progWin.close();
+            // null 是为了让 garbage collector 尽快回收
+            progWin = null; 
         }
 
-        if ($.global.tempResultMsg) {
-            alert($.global.tempResultMsg);
-            delete $.global.tempResultMsg;
+        // 【关键修改】在窗口完全关闭、对象销毁后，再弹窗
+        if (resultMsg) {
+            // 再次强制刷新主窗口，确保之前的 palette 消失视觉残留
+            win.update(); 
+            // 延时一点点确保 UI 线程空闲
+            $.sleep(100); 
+            alert(resultMsg);
         }
     };
+
 
 
     // --- 4. 导出功能 ---
