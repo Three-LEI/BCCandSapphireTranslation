@@ -638,7 +638,6 @@ function Zayu_OpenEditorWindow() {
         iptSearch.alignment = ["fill", "center"]; 
 
     var grpContent = win.add("group");
-		grpContent.preferredSize.height = 300;	
         grpContent.alignment = ["fill","fill"]; 
         grpContent.orientation = "row"; 
         grpContent.spacing = 0;
@@ -660,6 +659,7 @@ function Zayu_OpenEditorWindow() {
         grpTabName.orientation = "column"; 
         grpTabName.alignment = ["fill","fill"];
     var txtName = grpTabName.add('edittext', undefined, initialTextName, {multiline: true, scrollable: true});
+		txtName.preferredSize.height = 400;
         txtName.alignment = ["fill","fill"];
         if(monoFont) txtName.graphics.font = monoFont;
 
@@ -669,6 +669,7 @@ function Zayu_OpenEditorWindow() {
         grpTabParam.alignment = ["fill","fill"];
         grpTabParam.visible = false;
     var txtParam = grpTabParam.add('edittext', undefined, initialTextParam, {multiline: true, scrollable: true});
+		txtParam.preferredSize.height = 400;
         txtParam.alignment = ["fill","fill"];
         if(monoFont) txtParam.graphics.font = monoFont;
 
