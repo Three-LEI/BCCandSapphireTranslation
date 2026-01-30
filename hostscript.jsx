@@ -625,7 +625,8 @@ function Zayu_OpenEditorWindow() {
     var win = new Window("palette", "杂鱼-自定义汉化字典编辑器", undefined, {resizeable: false}); 
         win.orientation = "column"; 
         win.alignChildren = ["fill","top"]; 
-        win.preferredSize = [600, 700];
+        win.preferredSize = [600, 500];
+		win.maximumSize = [600, 600];
 
     var btnSave = win.add("button", undefined, "保存所有修改 (Ctrl+S)"); 
         btnSave.preferredSize.height = 40; 
