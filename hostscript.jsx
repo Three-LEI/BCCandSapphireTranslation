@@ -93,7 +93,7 @@ function Zayu_ShowCustomDictWindow() {
         NameTranslationTeam.orientation = "column"; 
         NameTranslationTeam.alignChildren = ["left","center"]; 
         NameTranslationTeam.spacing = 5;
-    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (需含Key)'); 
+    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (格式: "原文":"翻译")'); 
         NameTranslationTitleText.preferredSize.width = 350; 
     var NameTranslationEditBox = NameTranslationTeam.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         NameTranslationEditBox.preferredSize = [350, 150]; 
@@ -120,7 +120,7 @@ function Zayu_ShowCustomDictWindow() {
         ParameterTranslationGroup.orientation = "column"; 
         ParameterTranslationGroup.alignChildren = ["left","center"]; 
         ParameterTranslationGroup.spacing = 5; 
-    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (需含Key)'); 
+    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (格式: "原文":"翻译")'); 
         ParameterTranslationTitle.preferredSize.width = 350;
     var ParameterTranslationEditBox = ParameterTranslationGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         ParameterTranslationEditBox.preferredSize = [350, 150]; 
@@ -348,10 +348,15 @@ function Zayu_ShowCustomDictWindow() {
 
                 for (var i = 0; i < kLines.length; i++) {
                     var lineKey = kLines[i];
+                    // 1. 跳过纯空行
                     if (!lineKey || lineKey.replace(/\s/g, "") === "") continue;
                     
                     var key = cleanKey(lineKey); 
                     
+                    // 2. 关键修复：如果提取的Key是空的（比如只有双引号""），也跳过
+                    if (!key || key === "") continue;
+
+                    // 如果在官方字典 或 自定义字典中已存在
                     if ((dict1 && dict1.hasOwnProperty(key)) || (dict2 && dict2.hasOwnProperty(key))) {
                         removedCount++;
                     } else {
@@ -449,49 +454,48 @@ function Zayu_ShowCustomDictWindow() {
 
     // --- 6. 【逻辑修复】合并并保存 ---
     MergeFilesButton.onClick = function() {
-        // --- 处理插件名 (Name) ---
-        var localNameDict = readJsonFile(FILE_NAME_DICT); 
-        // 关键修复：只读取翻译框的内容，忽略左侧原文框
-        var uiNameLines = NameTranslationEditBox.text.split("\n");
-        var countName = 0;
-        
-        for (var i = 0; i < uiNameLines.length; i++) {
-            var line = uiNameLines[i];
-            // 只有包含冒号的行才被认为是有效的 "Key":"Value" 格式
-            if (line.indexOf(":") !== -1) {
-                var cleanK = cleanKey(line);      
-                var cleanV = cleanValue(line);    
-                // 确保 Key 不为空。Value 允许为空字符串（""），只要格式正确即可。
-                if (cleanK && cleanK !== "") {
-                    localNameDict[cleanK] = cleanV;
-                    countName++;
+        // 使用正则匹配来解析每一行，而不是简单的 split(":")
+        // 正则解释: 
+        // ^\s* -> 开头允许空白
+        // "(.+?)" -> 捕获双引号内的Key (Group 1)，+?表示非贪婪匹配
+        // \s*:\s* -> 中间是冒号，两边允许空白
+        // "(.*?)" -> 捕获双引号内的Value (Group 2)，允许空内容
+        var REGEX_LINE = /^\s*"(.+?)"\s*:\s*"(.*?)"/;
+
+        function parseAndMerge(sourceText, targetDict) {
+            var lines = sourceText.split("\n");
+            var count = 0;
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                var match = line.match(REGEX_LINE);
+                if (match) {
+                    var key = match[1]; // 提取的Key
+                    var val = match[2]; // 提取的Value
+                    
+                    // 再次确保 Key 不是纯空格
+                    if (key && key.replace(/\s/g, "") !== "") {
+                        targetDict[key] = val;
+                        count++;
+                    }
                 }
             }
+            return count;
         }
+
+        // --- 处理插件名 (Name) ---
+        var localNameDict = readJsonFile(FILE_NAME_DICT); 
+        var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
 
         // --- 处理参数名 (Parameter) ---
         var localParamDict = readJsonFile(FILE_PARAM_DICT); 
-        var uiParamLines = ParameterTranslationEditBox.text.split("\n");
-        var countParam = 0;
-        
-        for (var j = 0; j < uiParamLines.length; j++) {
-            var lineP = uiParamLines[j];
-            if (lineP.indexOf(":") !== -1) {
-                var cleanKP = cleanKey(lineP);
-                var cleanVP = cleanValue(lineP); 
-                if (cleanKP && cleanKP !== "") {
-                    localParamDict[cleanKP] = cleanVP;
-                    countParam++;
-                }
-            }
-        }
+        var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
 
         // --- 写入文件 ---
         var successName = safeWriteFile(FILE_NAME_DICT, JSON.stringify(localNameDict, null, 4));
         if(successName) {
             var successParam = safeWriteFile(FILE_PARAM_DICT, JSON.stringify(localParamDict, null, 4));
             if (successParam) {
-                alert("合并成功！\n\n(注意：合并操作完全基于右侧翻译框的内容，左侧原文框已被忽略)\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
+                alert("合并成功！\n\n(已自动过滤空行和格式错误的行)\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
             }
         }
     };
@@ -583,7 +587,8 @@ function Zayu_GetUpdateMessage(version) {
     switch (version) {
         case "0.0.3":
             return "1. 新增教程视频按钮。\n" + 
-                   "2. 优化合并逻辑：现在合并仅依赖右侧翻译框，不再受左侧列表顺序影响。";
+                   "2. 优化合并逻辑：采用正则匹配，解决部分电脑合并出现乱码的问题。\n" + 
+                   "3. 优化去重逻辑：不再产生空行。";
             
         default:
             return "常规优化与修复，感谢您的使用！";
