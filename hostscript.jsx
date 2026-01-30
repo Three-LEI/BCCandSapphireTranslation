@@ -464,45 +464,55 @@ function Zayu_ShowCustomDictWindow() {
         else confirmPermissionAndRetry(FILE_NAME_DICT);
     };
 
-    // 合并并保存
-    MergeFilesButton.onClick = function() {
-        var REGEX_LINE = /^\s*"(.+?)"\s*:\s*"(.*?)"/;
-        function parseAndMerge(sourceText, targetDict) {
-            if (!sourceText) return 0;
-            var lines = sourceText.split("\n");
-            var count = 0;
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i];
-                if (line.replace(/\s/g, "") === "") continue;
-                var match = line.match(REGEX_LINE);
-                if (match) {
-                    var key = match[1]; 
-                    var val = match[2]; 
-                    if (key && key.replace(/\s/g, "") !== "") {
-                        targetDict[key] = val;
-                        count++;
-                    }
-                }
-            }
-            return count;
-        }
-        var localNameDict = readJsonFile(FILE_NAME_DICT); 
-        var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
-        var localParamDict = readJsonFile(FILE_PARAM_DICT); 
-        var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
+	// --- 6. 合并并保存 (主界面) ---
+	MergeFilesButton.onClick = function() {
+		var REGEX_LINE = /^\s*"(.+?)"\s*:\s*"(.*?)"/;
 
-        if (countName === 0 && countParam === 0) {
-            alert("未检测到有效的翻译内容！\n请确保翻译框内的格式为：\n\"原文\" : \"翻译\"");
-            return;
-        }
-        var successName = safeWriteFile(FILE_NAME_DICT, JSON.stringify(localNameDict, null, 4));
-        if(successName) {
-            var successParam = safeWriteFile(FILE_PARAM_DICT, JSON.stringify(localParamDict, null, 4));
-            if (successParam) {
-                alert("合并成功！\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
-            }
-        }
-    };
+		// 【兼容修复】使用正则切分行，兼容 \r 和 \n
+		function parseAndMerge(sourceText, targetDict) {
+			if (!sourceText) return 0;
+			// 关键点：兼容 Mac/Win 换行符
+			var lines = sourceText.split(/[\r\n]+/);
+			var count = 0;
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				if (line.replace(/\s/g, "") === "") continue;
+				var match = line.match(REGEX_LINE);
+				if (match) {
+					var key = match[1];
+					var val = match[2];
+					if (key && key.replace(/\s/g, "") !== "") {
+						targetDict[key] = val;
+						count++;
+					}
+				}
+			}
+			return count;
+		}
+
+		var localNameDict = readJsonFile(FILE_NAME_DICT); 
+		var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
+
+		var localParamDict = readJsonFile(FILE_PARAM_DICT); 
+		var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
+
+		if (countName === 0 && countParam === 0) {
+			alert("未检测到有效的翻译内容！\n\n请确保翻译框内的格式为：\n\"原文\" : \"翻译\"");
+			return;
+		}
+
+		// 【核心修复】使用自定义序列化，代替 JSON.stringify，解决 AE 2026 乱码
+		var jsonName = customStringify(localNameDict);
+		var jsonParam = customStringify(localParamDict);
+
+		var successName = safeWriteFile(FILE_NAME_DICT, jsonName);
+		if(successName) {
+			var successParam = safeWriteFile(FILE_PARAM_DICT, jsonParam);
+			if (successParam) {
+				alert("合并成功！\n\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
+			}
+		}
+	};
 
     ClearEditBoxButton.onClick = function() {
         NameOriginalTextEditingBox.text = ""; NameTranslationEditBox.text = "";
@@ -522,9 +532,7 @@ function Zayu_ShowCustomDictWindow() {
 
 // =========================================================
 // 最终修正版：字典编辑器
-// 特性：打开即显示、支持搜索时编辑、自动保存逻辑
 // =========================================================
-
 function Zayu_OpenEditorWindow() {
 
     // --- 0. 路径配置 ---
@@ -532,14 +540,12 @@ function Zayu_OpenEditorWindow() {
     var _FILE_NAME = _LOCAL_DIR + "ZaYu-Customplugin-name-translation.json";
     var _FILE_PARAM = _LOCAL_DIR + "ZaYu-Custom-plugin-parameter-translation.json";
 
-    // --- 1. 数据核心 (Master Data) ---
+    // --- 1. 数据核心 ---
     var MasterDataName = {};
     var MasterDataParam = {};
     var currentSearchKeyword = ""; 
 
-    // --- 2. 核心工具函数 ---
-
-    // 读取 JSON 并处理异常
+    // --- 2. 工具函数 ---
     function internalReadJson(path) {
         var f = new File(path);
         if (!f.exists) return {};
@@ -547,24 +553,21 @@ function Zayu_OpenEditorWindow() {
         if (f.open("r")) {
             var str = f.read();
             f.close();
-            if (!str || str.replace(/\s/g, "") === "") return {};
-            try { return JSON.parse(str); } catch (e) { return {}; } // 失败返回空对象
+            try { return JSON.parse(str); } catch (e) { return {}; }
         }
         return {};
     }
 
-    // 将对象转为文本 (用于显示)
     function renderText(dataObj, keyword) {
         var lines = [];
         keyword = keyword ? keyword.toLowerCase() : "";
-        
         for (var key in dataObj) {
             if (dataObj.hasOwnProperty(key)) {
                 var val = dataObj[key];
-                // 搜索过滤
                 if (keyword === "" || 
                     key.toLowerCase().indexOf(keyword) !== -1 || 
                     String(val).toLowerCase().indexOf(keyword) !== -1) {
+                    // 这里不做转义，直接显示给用户编辑
                     lines.push('"' + key + '" : "' + val + '"');
                 }
             }
@@ -572,38 +575,31 @@ function Zayu_OpenEditorWindow() {
         return lines.join("\n");
     }
 
-    // 将文本同步回对象 (用于保存/更新)
+    // 【修复】同步逻辑：增强正则 + 兼容换行符
     function syncText(textStr, dataObj, isSearching) {
         if (!textStr) textStr = "";
         
-        // 【关键修复 1】: 使用正则分割换行符，同时兼容 \r\n (Win), \r (Mac), \n (Unix)
-        // 这样可以彻底解决 "AE 2026" 或不同系统下的换行符 Bug
-        var lines = textStr.split(/\r\n|\r|\n/);
-
-        // 【关键修复 2】: 优化正则
-        // 1. 允许 Key 和 Value 中间有空格
-        // 2. 允许 Value 的引号后面有 逗号(,) 或 空格
-        // 这样即使用户习惯性地在后面加了逗号，也能识别
+        // 1. 兼容所有平台的换行符
+        var lines = textStr.split(/[\r\n]+/);
+        
+        // 2. 正则优化：
+        // 允许冒号周围有空格
+        // 允许 Value 的引号后面跟逗号或空格
         var REGEX = /^\s*"(.+?)"\s*:\s*"(.*?)"[\s,]*$/; 
         
         var currentKeys = {};
 
-        // 1. 更新/新增
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
-            // 跳过空行
             if (line.replace(/\s/g, "") === "") continue;
 
             var match = line.match(REGEX);
-            
-            // match[1] 是 Key, match[2] 是 Value
             if (match && match[1]) {
                 dataObj[match[1]] = match[2];
                 currentKeys[match[1]] = true;
             }
         }
 
-        // 2. 删除 (仅在非搜索模式下执行删除)
         if (!isSearching) {
             for (var dbKey in dataObj) {
                 if (dataObj.hasOwnProperty(dbKey) && !currentKeys[dbKey]) {
@@ -613,12 +609,11 @@ function Zayu_OpenEditorWindow() {
         }
     }
 
-
-    // --- 3. 初始化数据 (关键步骤) ---
+    // --- 3. 初始化 ---
     MasterDataName = internalReadJson(_FILE_NAME);
     MasterDataParam = internalReadJson(_FILE_PARAM);
 
-    // 预先生成初始文本 (确保 UI 创建时就有内容！)
+    // 预先生成初始文本
     var initialTextName = renderText(MasterDataName, "");
     var initialTextParam = renderText(MasterDataParam, "");
     
@@ -626,82 +621,58 @@ function Zayu_OpenEditorWindow() {
     var countN = 0; for(var k in MasterDataName) countN++;
     var countP = 0; for(var k in MasterDataParam) countP++;
 
-
     // ================= UI 构建 =================
-    var win = new Window("palette", "杂鱼-自定义汉化字典编辑器", undefined, {resizeable: false}); 
+    var win = new Window("palette", "杂鱼-自定义汉化字典编辑器", undefined, {resizeable: true}); 
         win.orientation = "column"; 
         win.alignChildren = ["fill","top"]; 
-        win.spacing = 10; 
-        win.margins = 16; 
         win.preferredSize = [600, 700];
 
-    // 顶部按钮
     var btnSave = win.add("button", undefined, "保存所有修改 (Ctrl+S)"); 
         btnSave.preferredSize.height = 40; 
-        btnSave.alignment = ["fill", "top"];
 
-    // 搜索组
     var grpSearch = win.add("group"); 
         grpSearch.orientation = "row"; 
-        grpSearch.alignChildren = ["left","center"];
     grpSearch.add("statictext", undefined, "搜索关键词："); 
     var iptSearch = grpSearch.add('edittext {enterKeySignalsOnChange: true}'); 
         iptSearch.alignment = ["fill", "center"]; 
-        iptSearch.helpTip = "输入关键词过滤。过滤状态下修改内容会自动同步。";
 
-    // 主内容容器
     var grpContent = win.add("group"); 
         grpContent.alignment = ["fill","fill"]; 
         grpContent.orientation = "row"; 
         grpContent.spacing = 0;
 
-    // 左侧导航
     var listNav = grpContent.add("listbox", undefined, ['插件名称 (' + countN + ')', '插件参数 (' + countP + ')']); 
         listNav.preferredSize.width = 150;
         listNav.alignment = ["left", "fill"]; 
 
-    // 右侧堆叠区域
     var grpStack = grpContent.add("group"); 
         grpStack.alignment = ["fill","fill"]; 
         grpStack.orientation = "stack"; 
 
-    // 字体设置
     var monoFont;
     try { monoFont = ScriptUI.newFont("Consolas", "REGULAR", 14); } catch(e){}
 
-    // --- TAB 1: 名称 ---
+    // TAB 1
     var grpTabName = grpStack.add("group"); 
         grpTabName.orientation = "column"; 
         grpTabName.alignment = ["fill","fill"];
-        grpTabName.alignChildren = ["fill","fill"];
-    
-    // 【核心修正】直接在创建时把 text 属性赋进去，不要等后面再赋
     var txtName = grpTabName.add('edittext', undefined, initialTextName, {multiline: true, scrollable: true});
-        txtName.preferredSize = [400, 500]; // 必须给一个初始大小
+        txtName.alignment = ["fill","fill"];
         if(monoFont) txtName.graphics.font = monoFont;
 
-    // --- TAB 2: 参数 ---
+    // TAB 2
     var grpTabParam = grpStack.add("group"); 
         grpTabParam.orientation = "column"; 
         grpTabParam.alignment = ["fill","fill"];
-        grpTabParam.alignChildren = ["fill","fill"];
-        grpTabParam.visible = false; // 初始隐藏
-    
-    // 【核心修正】同上
+        grpTabParam.visible = false;
     var txtParam = grpTabParam.add('edittext', undefined, initialTextParam, {multiline: true, scrollable: true});
-        txtParam.preferredSize = [400, 500]; 
+        txtParam.alignment = ["fill","fill"];
         if(monoFont) txtParam.graphics.font = monoFont;
 
-
-    // ================= 事件逻辑 =================
-
-    // 切换标签
+    // ================= 事件 =================
     listNav.onChange = function() {
         if (!listNav.selection) return;
-        
-        // 切换前先保存当前视图的修改到内存
         syncCurrent();
-
         if (listNav.selection.index === 0) {
             grpTabName.visible = true;
             grpTabParam.visible = false;
@@ -712,96 +683,58 @@ function Zayu_OpenEditorWindow() {
     }
     listNav.selection = 0;
 
-    // 搜索逻辑
     iptSearch.onChanging = function() {
-        // 1. 先把当前还没搜索时的修改保存到内存
         syncCurrent();
-        
-        // 2. 更新关键词
         currentSearchKeyword = this.text;
-
-        // 3. 重新渲染文本框 (从内存读出含关键词的条目)
         txtName.text = renderText(MasterDataName, currentSearchKeyword);
         txtParam.text = renderText(MasterDataParam, currentSearchKeyword);
     }
 
-    // 实时编辑同步
-    // 当你在编辑框里打字时，脚本会尝试解析并更新内存对象
-    // 这样当你清空搜索框时，刚才修改的内容会保留下来
     txtName.onChange = function() { syncText(this.text, MasterDataName, (currentSearchKeyword !== "")); }
     txtParam.onChange = function() { syncText(this.text, MasterDataParam, (currentSearchKeyword !== "")); }
 
-    // 辅助：手动调用同步
     function syncCurrent() {
         var isFilter = (currentSearchKeyword !== "");
-        // 只有当前显示的那个 Tab 需要同步，另一个 Tab 内容没变不需要动
-        if (grpTabName.visible) {
-            syncText(txtName.text, MasterDataName, isFilter);
-        } else {
-            syncText(txtParam.text, MasterDataParam, isFilter);
-        }
+        if (grpTabName.visible) syncText(txtName.text, MasterDataName, isFilter);
+        else syncText(txtParam.text, MasterDataParam, isFilter);
     }
 
-    // 保存按钮
+    // 【核心修复】保存按钮
     btnSave.onClick = function() {
-        // 1. 强制同步当前视图
         syncCurrent(); 
 
-        // 2. 安全检查：确保数据不是空的（或者你允许空字典）
-        // 如果正则彻底失败，对象可能是空的，这里可以加个判断防止覆盖原文件
-        // (可选：如果你希望允许清空字典，可以去掉这个检查)
-        /*
-        var keyCount = 0;
-        for(var k in MasterDataName) keyCount++;
-        if (keyCount === 0 && txtName.text.length > 10) {
-             alert("警告：检测到对象为空，但编辑框有内容。\n可能发生了解析错误，已终止保存以保护原文件！\n请检查文本格式是否为 \"Key\" : \"Value\"");
-             return;
-        }
-        */
-
-        // 3. 写入硬盘
         var f1 = new File(_FILE_NAME);
         var f2 = new File(_FILE_PARAM);
-        
-        // 【关键】强制 UTF-8 编码，防止中文乱码
         f1.encoding = "UTF-8"; 
         f2.encoding = "UTF-8";
         
-        var ok = false;
-        // 使用 try-catch 包裹写入过程
         try {
             if (f1.open("w") && f2.open("w")) {
-                // 使用自带的 JSON 库生成标准 JSON
-                var strName = JSON.stringify(MasterDataName, null, 4);
-                var strParam = JSON.stringify(MasterDataParam, null, 4);
+                // !!! 这里使用自定义序列化代替 JSON.stringify !!!
+                var strName = customStringify(MasterDataName);
+                var strParam = customStringify(MasterDataParam);
                 
                 f1.write(strName);
                 f2.write(strParam);
-                
                 f1.close(); 
                 f2.close();
-                ok = true;
+                
+                // 更新计数
+                var cN = 0; for(var k in MasterDataName) cN++;
+                var cP = 0; for(var k in MasterDataParam) cP++;
+                listNav.items[0].text = '插件名称 (' + cN + ')';
+                listNav.items[1].text = '插件参数 (' + cP + ')';
+                
+                alert("保存成功！");
+            } else {
+                alert("无法写入文件，请检查权限。");
             }
         } catch(e) {
-            alert("写入文件时发生错误: " + e.toString());
-            return;
-        }
-
-        if (ok) {
-            var cN = 0; for(var k in MasterDataName) cN++;
-            var cP = 0; for(var k in MasterDataParam) cP++;
-            listNav.items[0].text = '插件名称 (' + cN + ')';
-            listNav.items[1].text = '插件参数 (' + cP + ')';
-            alert("保存成功！");
-        } else {
-            alert("保存失败，无法写入文件（可能是权限问题）。");
+            alert("错误: " + e.toString());
         }
     }
 
-
-    // 窗口调整大小时重新布局
     win.onResizing = function() { win.layout.layout(true); }
-    
     win.center();
     win.show();
 }
@@ -809,6 +742,32 @@ function Zayu_OpenEditorWindow() {
 
 
 // ================= 辅助函数库 =================
+
+// =========================================================
+// 【核心修复】自定义 JSON 序列化函数
+// 解决 AE 2026/Beta 中原生 JSON.stringify 输出乱码或空对象的问题
+// =========================================================
+function customStringify(obj) {
+    var parts = [];
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            // 1. 获取 key 和 value
+            var k = String(key);
+            var v = String(obj[key]);
+            
+            // 2. 转义处理：先转义反斜杠，再转义双引号
+            // 必须严格按照 JSON 规范，否则读取时会报错
+            k = k.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+            v = v.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+            
+            // 3. 拼接一行
+            parts.push('\t"' + k + '": "' + v + '"');
+        }
+    }
+    // 4. 组合成完整 JSON 字符串
+    return "{\n" + parts.join(",\n") + "\n}";
+}
+
 
 // 【修复】恢复你要求的 switch 版本日志逻辑
 function Zayu_GetUpdateMessage(version) {
