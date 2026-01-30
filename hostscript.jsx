@@ -82,7 +82,7 @@ function Zayu_ShowCustomDictWindow() {
     var OriginalTitleText = OriginalNameGroup.add("statictext", undefined, "原文编辑框 - [0项]"); 
         OriginalTitleText.preferredSize.width = 350; 
     var NameOriginalTextEditingBox = OriginalNameGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        NameOriginalTextEditingBox.preferredSize = [350, 300]; 
+        NameOriginalTextEditingBox.preferredSize = [350, 150]; 
 
     // 插件名-翻译
     var NameTranslationTeam = PluginNameArea.add("group", undefined, {name: "NameTranslationTeam"}); 
@@ -92,7 +92,7 @@ function Zayu_ShowCustomDictWindow() {
     var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译编辑框 - 翻译格式必须按照 "英文原文" : "中文翻译"'); 
         NameTranslationTitleText.preferredSize.width = 350; 
     var NameTranslationEditBox = NameTranslationTeam.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        NameTranslationEditBox.preferredSize = [350, 300]; 
+        NameTranslationEditBox.preferredSize = [350, 150]; 
 
     // --- 插件参数区 ---
     var PluginParameterArea = win.add("panel", undefined, undefined, {name: "PluginParameterArea"}); 
@@ -109,7 +109,7 @@ function Zayu_ShowCustomDictWindow() {
     var OriginalParameterTitleText = ParameterOriginalTextGroup.add("statictext", undefined, "原文编辑框 - [0项]"); 
         OriginalParameterTitleText.preferredSize.width = 350;
     var ParameterTextEditingBox = ParameterOriginalTextGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        ParameterTextEditingBox.preferredSize = [350, 400]; 
+        ParameterTextEditingBox.preferredSize = [350, 150]; 
 
     // 参数-翻译
     var ParameterTranslationGroup = PluginParameterArea.add("group", undefined, {name: "ParameterTranslationGroup"}); 
@@ -119,7 +119,7 @@ function Zayu_ShowCustomDictWindow() {
     var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译编辑框 - 翻译格式必须按照 "英文原文" : "中文翻译"'); 
         ParameterTranslationTitle.preferredSize.width = 350;
     var ParameterTranslationEditBox = ParameterTranslationGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        ParameterTranslationEditBox.preferredSize = [350, 400]; 
+        ParameterTranslationEditBox.preferredSize = [350, 150]; 
 
     // --- 底部功能区 ---
     var BottomFunctionGroup = win.add("group", undefined, {name: "BottomFunctionGroup"}); 
