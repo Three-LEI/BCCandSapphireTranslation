@@ -628,7 +628,7 @@ function Zayu_OpenEditorWindow() {
         win.preferredSize = [600, 500];
 		win.maximumSize = [600, 600];
 
-    var btnSave = win.add("button", undefined, "保存所有修改 (Ctrl+S)"); 
+    var btnSave = win.add("button", undefined, "保存对自定义汉化字典的修改"); 
         btnSave.preferredSize.height = 40; 
 
     var grpSearch = win.add("group"); 
