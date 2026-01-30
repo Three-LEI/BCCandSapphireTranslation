@@ -170,15 +170,21 @@ function Zayu_ShowCustomDictWindow() {
         var helpFile = new File(DIR_PATH + "help.mp4");
         
         if (!helpFile.exists) {
-            alert("未找到教程视频！");
+            alert("未找到教程视频！\n路径：" + helpFile.fsName);
             return;
         }
 
-        // 使用 Windows CMD start 命令非阻塞打开
-        // start "" "path" -> "" 是为了防止路径有空格时被误认为标题
-        // 这样 AE 不会等待视频播放器关闭，避免卡死
-        var cmd = 'cmd /c start "" "' + helpFile.fsName + '"';
-        system.callSystem(cmd);
+        try {
+            // 使用 Windows CMD start 命令非阻塞打开
+            // system.callSystem 需要“允许脚本写入文件和访问网络”权限
+            var cmd = 'cmd /c start "" "' + helpFile.fsName + '"';
+            system.callSystem(cmd);
+        } catch(e) {
+            // 捕获权限错误或执行错误
+            if(confirm("无法打开视频，可能是权限不足！\n请确保勾选了“允许脚本写入文件和访问网络”。\n\n是否立即打开首选项？")) {
+                app.executeCommand(3131); // 3131 是打开 AE 首选项 > 脚本和表达式 的命令ID
+            }
+        }
     };
 
 
