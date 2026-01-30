@@ -637,10 +637,12 @@ function Zayu_OpenEditorWindow() {
     var iptSearch = grpSearch.add('edittext {enterKeySignalsOnChange: true}'); 
         iptSearch.alignment = ["fill", "center"]; 
 
-    var grpContent = win.add("group"); 
+    var grpContent = win.add("group");
+		grpContent.preferredSize.height = 300;	
         grpContent.alignment = ["fill","fill"]; 
         grpContent.orientation = "row"; 
         grpContent.spacing = 0;
+		
 
     var listNav = grpContent.add("listbox", undefined, ['插件名称 (' + countN + ')', '插件参数 (' + countP + ')']); 
         listNav.preferredSize.width = 150;
@@ -651,7 +653,7 @@ function Zayu_OpenEditorWindow() {
         grpStack.orientation = "stack"; 
 
     var monoFont;
-    try { monoFont = ScriptUI.newFont("Consolas", "REGULAR", 14); } catch(e){}
+    try { monoFont = ScriptUI.newFont("Microsoft YaHei", "REGULAR", 16); } catch(e){}
 
     // TAB 1
     var grpTabName = grpStack.add("group"); 
