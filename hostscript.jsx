@@ -442,27 +442,57 @@ function Zayu_ShowCustomDictWindow() {
         else alert("本地没有找到字典文件，无法导出。");
     };
 
-    // 导入功能
+    // ===========================================
+    // 【修改】导入功能 - 支持覆盖或追加合并
+    // ===========================================
     ImportDictionary.onClick = function() {
+        // --- 第一步：处理插件名字典 (Name) ---
         alert("步骤 1/2：请选择 [" + FILE_NAME_DICT_NAME + "]");
         var fName = File.openDialog("选择 " + FILE_NAME_DICT_NAME, "*.json");
         if (!fName) return;
-        if (decodeURI(fName.name) !== FILE_NAME_DICT_NAME) { alert("错误：文件名必须是 " + FILE_NAME_DICT_NAME); return; }
+        if (decodeURI(fName.name) !== FILE_NAME_DICT_NAME) { 
+            alert("错误：文件名必须是 " + FILE_NAME_DICT_NAME); return; 
+        }
 
+        // 询问模式 - Name
+        var modeName = "overwrite";
+        if (new File(FILE_NAME_DICT).exists) {
+            var confirmMsg = "检测到本地已存在插件名字典。\n\n" +
+                             "【是 (Yes)】= 追加合并 (Merge)\n保留本地原有条目，将导入文件中的新条目加入，重复的条目以导入文件为准。\n\n" +
+                             "【否 (No)】= 覆盖 (Overwrite)\n删除本地文件，完全替换为导入的文件。";
+            if (confirm(confirmMsg, false, "导入模式选择 - 插件名")) {
+                modeName = "merge";
+            }
+        }
+
+        // --- 第二步：处理参数字典 (Param) ---
         alert("步骤 2/2：请选择 [" + FILE_PARAM_DICT_NAME + "]");
         var fParam = File.openDialog("选择 " + FILE_PARAM_DICT_NAME, "*.json");
         if (!fParam) return;
-        if (decodeURI(fParam.name) !== FILE_PARAM_DICT_NAME) { alert("错误：文件名必须是 " + FILE_PARAM_DICT_NAME); return; }
+        if (decodeURI(fParam.name) !== FILE_PARAM_DICT_NAME) { 
+            alert("错误：文件名必须是 " + FILE_PARAM_DICT_NAME); return; 
+        }
 
-        var targetFolder = new Folder(DIR_PATH);
-        if (!targetFolder.exists) targetFolder.create();
+        // 询问模式 - Param
+        var modeParam = "overwrite";
+        if (new File(FILE_PARAM_DICT).exists) {
+            var confirmMsgParam = "检测到本地已存在参数字典。\n\n" +
+                                  "【是 (Yes)】= 追加合并 (Merge)\n保留本地原有条目，将导入文件中的新条目加入，重复的条目以导入文件为准。\n\n" +
+                                  "【否 (No)】= 覆盖 (Overwrite)\n删除本地文件，完全替换为导入的文件。";
+            if (confirm(confirmMsgParam, false, "导入模式选择 - 参数")) {
+                modeParam = "merge";
+            }
+        }
+
+        // --- 执行处理 ---
+        var resultName = Zayu_ProcessImportFile(fName, FILE_NAME_DICT, modeName);
+        var resultParam = Zayu_ProcessImportFile(fParam, FILE_PARAM_DICT, modeParam);
+
+        alert("导入完成！\n\n插件名字典: " + resultName + "\n参数字典: " + resultParam);
         
-        var success = true;
-        if (!fName.copy(FILE_NAME_DICT)) success = false;
-        if (!fParam.copy(FILE_PARAM_DICT)) success = false;
-        if (success) alert("导入成功！");
-        else confirmPermissionAndRetry(FILE_NAME_DICT);
+        // 如果当前编辑器开着，可能需要刷新一下（如果有刷新逻辑的话），或者提醒用户重启
     };
+
 
 	// --- 6. 合并并保存 (主界面) ---
 	MergeFilesButton.onClick = function() {
@@ -770,6 +800,62 @@ function customStringify(obj) {
     }
     // 4. 组合成完整 JSON 字符串
     return "{\n" + parts.join(",\n") + "\n}";
+}
+
+// =========================================================
+// 【新增】导入处理逻辑核心函数
+// handles: 文件对象, 目标路径字符串, 模式("merge" or "overwrite")
+// =========================================================
+function Zayu_ProcessImportFile(importFile, targetPath, mode) {
+    try {
+        var targetFile = new File(targetPath);
+        
+        // 模式 1: 覆盖 (Overwrite) 或 本地文件不存在
+        if (mode === "overwrite" || !targetFile.exists) {
+            // 确保父目录存在
+            var folder = new Folder(DIR_PATH);
+            if (!folder.exists) folder.create();
+            
+            // 直接复制 (copy会返回true/false)
+            if (importFile.copy(targetPath)) {
+                return "已覆盖";
+            } else {
+                return "覆盖失败(权限不足?)";
+            }
+        } 
+        
+        // 模式 2: 追加合并 (Merge)
+        else if (mode === "merge") {
+            // 1. 读取本地现有数据
+            var localData = readJsonFile(targetPath);
+            
+            // 2. 读取导入文件数据
+            var importData = readJsonFile(importFile.fsName);
+            
+            // 3. 合并逻辑：遍历导入的数据，写入本地对象
+            // (如果key已存在，importData的值会覆盖localData的值，实现更新)
+            var count = 0;
+            for (var key in importData) {
+                if (importData.hasOwnProperty(key)) {
+                    localData[key] = importData[key];
+                    count++;
+                }
+            }
+            
+            // 4. 使用你之前修复的 customStringify 进行序列化，防止中文乱码
+            var mergedJson = customStringify(localData);
+            
+            // 5. 写入回本地
+            if (safeWriteFile(targetPath, mergedJson)) {
+                return "已合并";
+            } else {
+                return "合并写入失败";
+            }
+        }
+    } catch(e) {
+        return "错误: " + e.toString();
+    }
+    return "未知状态";
 }
 
 
