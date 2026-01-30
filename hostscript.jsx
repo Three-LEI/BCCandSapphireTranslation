@@ -1,7 +1,7 @@
 // hostscript.jsx
 
 // ================= 全局配置 =================
-var APP_VERSION = "0.0.3"; 
+var APP_VERSION = "0.0.4"; // 版本号更新
 var DIR_PATH = "C:\\Users\\Public\\Zayu_Hook_Translation\\";
 
 // 自定义文件
@@ -49,7 +49,7 @@ function Zayu_ShowCustomDictWindow() {
 
     // 3. 左侧：清空按钮
     var ClearCustomDictionary = ImportAndExportGroup.add("button", undefined, undefined, {name: "ClearCustomDictionary"}); 
-        ClearCustomDictionary.text = "清空本地自定义的汉化字典"; 
+        ClearCustomDictionary.text = "清空本地自定义字典"; 
         ClearCustomDictionary.preferredSize.height = 30; 
         ClearCustomDictionary.helpTip = "慎用！这将删除磁盘上的两个自定义JSON文件。";
 
@@ -63,7 +63,8 @@ function Zayu_ShowCustomDictWindow() {
         spacer.alignment = ["fill", "fill"];
 
     // 5. 右侧：版本号
-    var VersionText = ImportAndExportGroup.add("statictext", undefined, "Version " + APP_VERSION);
+    var VersionText = ImportAndExportGroup.add("statictext", undefined, "v" + APP_VERSION);
+        // 尝试设置字体颜色（部分AE版本有效）
         var g = VersionText.graphics;
         try {
             g.foregroundColor = g.newPen(g.PenType.SOLID_COLOR, [0, 1, 0, 1], 1);
@@ -83,7 +84,8 @@ function Zayu_ShowCustomDictWindow() {
         OriginalNameGroup.alignChildren = ["left","center"]; 
         OriginalNameGroup.spacing = 5;
     
-    var OriginalTitleText = OriginalNameGroup.add("statictext", undefined, "原文编辑框 (仅参考) - [0项]"); 
+    // 【修改】去掉了 (Key)
+    var OriginalTitleText = OriginalNameGroup.add("statictext", undefined, "原文 - [0项]"); 
         OriginalTitleText.preferredSize.width = 350; 
     var NameOriginalTextEditingBox = OriginalNameGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         NameOriginalTextEditingBox.preferredSize = [350, 150]; 
@@ -93,7 +95,7 @@ function Zayu_ShowCustomDictWindow() {
         NameTranslationTeam.orientation = "column"; 
         NameTranslationTeam.alignChildren = ["left","center"]; 
         NameTranslationTeam.spacing = 5;
-    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (格式: "原文":"翻译")'); 
+    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译 - [合并时仅以此框内容为准]'); 
         NameTranslationTitleText.preferredSize.width = 350; 
     var NameTranslationEditBox = NameTranslationTeam.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         NameTranslationEditBox.preferredSize = [350, 150]; 
@@ -110,7 +112,8 @@ function Zayu_ShowCustomDictWindow() {
         ParameterOriginalTextGroup.orientation = "column"; 
         ParameterOriginalTextGroup.alignChildren = ["left","center"]; 
         ParameterOriginalTextGroup.spacing = 5; 
-    var OriginalParameterTitleText = ParameterOriginalTextGroup.add("statictext", undefined, "原文编辑框 (仅参考) - [0项]"); 
+    // 【修改】去掉了 (Key)
+    var OriginalParameterTitleText = ParameterOriginalTextGroup.add("statictext", undefined, "原文 - [0项]"); 
         OriginalParameterTitleText.preferredSize.width = 350;
     var ParameterTextEditingBox = ParameterOriginalTextGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         ParameterTextEditingBox.preferredSize = [350, 150]; 
@@ -120,7 +123,7 @@ function Zayu_ShowCustomDictWindow() {
         ParameterTranslationGroup.orientation = "column"; 
         ParameterTranslationGroup.alignChildren = ["left","center"]; 
         ParameterTranslationGroup.spacing = 5; 
-    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译编辑框 - 合并时将只读取此处内容 (格式: "原文":"翻译")'); 
+    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译 - [合并时仅以此框内容为准]'); 
         ParameterTranslationTitle.preferredSize.width = 350;
     var ParameterTranslationEditBox = ParameterTranslationGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         ParameterTranslationEditBox.preferredSize = [350, 150]; 
@@ -169,22 +172,18 @@ function Zayu_ShowCustomDictWindow() {
     // 逻辑功能实现
     // =========================================================
 
-    // --- 【新增功能】打开教程视频 ---
+    // --- 打开教程视频 ---
     OpenHelpVideoButton.onClick = function() {
         var helpFile = new File(DIR_PATH + "help.mp4");
-        
         if (!helpFile.exists) {
             alert("未找到教程视频！\n路径：" + helpFile.fsName);
             return;
         }
-
         try {
             var cmd = 'cmd /c start "" "' + helpFile.fsName + '"';
             system.callSystem(cmd);
         } catch(e) {
-            if(confirm("无法打开视频，可能是权限不足！\n请确保勾选了“允许脚本写入文件和访问网络”。\n\n是否立即打开首选项？")) {
-                app.executeCommand(3131); 
-            }
+            if(confirm("无法打开视频，可能是权限不足！\n是否打开首选项？")) app.executeCommand(3131); 
         }
     };
 
@@ -242,8 +241,8 @@ function Zayu_ShowCustomDictWindow() {
         pluginNames = uniqueArray(pluginNames);
         params = uniqueArray(params);
 
-        OriginalTitleText.text = "原文 (Key) - [" + pluginNames.length + "项]";
-        OriginalParameterTitleText.text = "原文 (Key) - [" + params.length + "项]";
+        OriginalTitleText.text = "原文 - [" + pluginNames.length + "项]";
+        OriginalParameterTitleText.text = "原文 - [" + params.length + "项]";
 
         var nameStr = "";
         for (var n = 0; n < pluginNames.length; n++) {
@@ -284,18 +283,18 @@ function Zayu_ShowCustomDictWindow() {
         var resName = formatText(NameOriginalTextEditingBox.text);
         if (NameOriginalTextEditingBox.text !== "") {
             NameOriginalTextEditingBox.text = resName.text;
-            OriginalTitleText.text = "原文 (Key) - [" + resName.count + "项]";
+            OriginalTitleText.text = "原文 - [" + resName.count + "项]";
         }
 
         var resParam = formatText(ParameterTextEditingBox.text);
         if (ParameterTextEditingBox.text !== "") {
             ParameterTextEditingBox.text = resParam.text;
-            OriginalParameterTitleText.text = "原文 (Key) - [" + resParam.count + "项]";
+            OriginalParameterTitleText.text = "原文 - [" + resParam.count + "项]";
         }
     }
 
 
-    // --- 3. [修复版] 去除重复的汉化对照 ---
+    // --- 3. [修复版] 去除重复的汉化对照 (彻底解决空行问题) ---
     RemoveDupeButton.onClick = function() {
         var nameText = NameOriginalTextEditingBox.text;
         var paramText = ParameterTextEditingBox.text;
@@ -307,6 +306,7 @@ function Zayu_ShowCustomDictWindow() {
             return;
         }
 
+        // 进度窗口
         var progWin = new Window("palette", "正在处理...", undefined, {closeButton: false}); 
             progWin.preferredSize = [400, 100];
             progWin.alignChildren = ["fill", "center"];
@@ -338,28 +338,35 @@ function Zayu_ShowCustomDictWindow() {
             progWin.update();
             $.sleep(10);
 
+            // === 核心过滤函数 (解决空行问题) ===
             var filterContentSync = function(keyStr, valStr, dict1, dict2) {
                 if (!keyStr) return { keys: "", vals: "", removed: 0, remain: 0 };
                 var kLines = keyStr.split("\n");
-                // 翻译框如果没有内容，就当做全是空行
                 var vLines = (valStr && valStr.replace(/\s/g, "") !== "") ? valStr.split("\n") : [];
                 
-                var resK = [], resV = [], removedCount = 0;
+                var resK = [];
+                var resV = [];
+                var removedCount = 0;
 
                 for (var i = 0; i < kLines.length; i++) {
                     var lineKey = kLines[i];
-                    // 1. 跳过纯空行
-                    if (!lineKey || lineKey.replace(/\s/g, "") === "") continue;
+                    
+                    // 1. 严格检查：如果这行全是空格，直接跳过 (Skip empty lines)
+                    if (!lineKey || lineKey.replace(/\s/g, "") === "") {
+                        continue; 
+                    }
                     
                     var key = cleanKey(lineKey); 
-                    
-                    // 2. 关键修复：如果提取的Key是空的（比如只有双引号""），也跳过
-                    if (!key || key === "") continue;
+                    if (!key || key === "") {
+                        continue; // Key 为空也跳过
+                    }
 
-                    // 如果在官方字典 或 自定义字典中已存在
+                    // 2. 查重
                     if ((dict1 && dict1.hasOwnProperty(key)) || (dict2 && dict2.hasOwnProperty(key))) {
                         removedCount++;
+                        // 是重复项 -> 跳过，什么都不做，自然不会产生空行
                     } else {
+                        // 是新项 -> 添加到数组
                         resK.push(lineKey);
                         resV.push(vLines[i] || ""); 
                     }
@@ -375,15 +382,16 @@ function Zayu_ShowCustomDictWindow() {
             var resName = filterContentSync(NameOriginalTextEditingBox.text, NameTranslationEditBox.text, zyNameDict, customNameDict);
             var resParam = filterContentSync(ParameterTextEditingBox.text, ParameterTranslationEditBox.text, replaceMapDict, customParamDict);
 
+            // 更新 UI
             if(!isNameEmpty) {
                 NameOriginalTextEditingBox.text = resName.keys;
                 NameTranslationEditBox.text = resName.vals;
-                OriginalTitleText.text = "原文 (Key) - [" + resName.remain + "项]";
+                OriginalTitleText.text = "原文 - [" + resName.remain + "项]";
             }
             if(!isParamEmpty) {
                 ParameterTextEditingBox.text = resParam.keys;
                 ParameterTranslationEditBox.text = resParam.vals;
-                OriginalParameterTitleText.text = "原文 (Key) - [" + resParam.remain + "项]";
+                OriginalParameterTitleText.text = "原文 - [" + resParam.remain + "项]";
             }
 
             resultMsg = "去重完成！\n插件名移除: " + resName.removed + "\n参数名移除: " + resParam.removed;
@@ -452,50 +460,65 @@ function Zayu_ShowCustomDictWindow() {
     };
 
 
-    // --- 6. 【逻辑修复】合并并保存 ---
+    // --- 6. 【逻辑彻底修复】合并并保存 (解决乱码问题) ---
     MergeFilesButton.onClick = function() {
-        // 使用正则匹配来解析每一行，而不是简单的 split(":")
-        // 正则解释: 
-        // ^\s* -> 开头允许空白
-        // "(.+?)" -> 捕获双引号内的Key (Group 1)，+?表示非贪婪匹配
-        // \s*:\s* -> 中间是冒号，两边允许空白
-        // "(.*?)" -> 捕获双引号内的Value (Group 2)，允许空内容
+        // === 正则表达式解析器 ===
+        // 解释：
+        // ^\s*       -> 匹配行首的空白
+        // "(.+?)"    -> 匹配第一个双引号内的内容作为 Key (捕获组1)
+        // \s*:\s*    -> 匹配中间的冒号，允许冒号周围有空格
+        // "(.*?)"    -> 匹配第二个双引号内的内容作为 Value (捕获组2)
         var REGEX_LINE = /^\s*"(.+?)"\s*:\s*"(.*?)"/;
 
         function parseAndMerge(sourceText, targetDict) {
+            if (!sourceText) return 0;
             var lines = sourceText.split("\n");
             var count = 0;
+            
             for (var i = 0; i < lines.length; i++) {
                 var line = lines[i];
+                // 仅当行非空时才尝试匹配
+                if (line.replace(/\s/g, "") === "") continue;
+
                 var match = line.match(REGEX_LINE);
                 if (match) {
                     var key = match[1]; // 提取的Key
                     var val = match[2]; // 提取的Value
                     
-                    // 再次确保 Key 不是纯空格
+                    // 再次确保 Key 有效
                     if (key && key.replace(/\s/g, "") !== "") {
                         targetDict[key] = val;
                         count++;
                     }
                 }
+                // 如果没有 match (例如只有 { : , } 这种乱码)，则会自动被忽略
             }
             return count;
         }
 
-        // --- 处理插件名 (Name) ---
+        // --- 核心：仅读取“翻译编辑框” (Translation Box) ---
+        // 原文框 (Original Box) 仅作为给用户的参考，合并逻辑完全忽略它
+        
+        // 1. 处理插件名 (Name)
         var localNameDict = readJsonFile(FILE_NAME_DICT); 
         var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
 
-        // --- 处理参数名 (Parameter) ---
+        // 2. 处理参数名 (Parameter)
         var localParamDict = readJsonFile(FILE_PARAM_DICT); 
         var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
 
         // --- 写入文件 ---
+        // 如果两个计数都是0，说明格式不对或者没填内容
+        if (countName === 0 && countParam === 0) {
+            alert("未检测到有效的翻译内容！\n\n请确保翻译框内的格式为：\n\"原文\" : \"翻译\"\n\n(注意双引号和冒号)");
+            return;
+        }
+
         var successName = safeWriteFile(FILE_NAME_DICT, JSON.stringify(localNameDict, null, 4));
         if(successName) {
             var successParam = safeWriteFile(FILE_PARAM_DICT, JSON.stringify(localParamDict, null, 4));
             if (successParam) {
-                alert("合并成功！\n\n(已自动过滤空行和格式错误的行)\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
+                alert("合并成功！\n\n(已使用正则过滤乱码)\n插件名更新: " + countName + " 条\n参数更新: " + countParam + " 条");
             }
         }
     };
@@ -505,8 +528,8 @@ function Zayu_ShowCustomDictWindow() {
         NameTranslationEditBox.text = "";
         ParameterTextEditingBox.text = "";
         ParameterTranslationEditBox.text = "";
-        OriginalTitleText.text = "原文 (Key) - [0项]";
-        OriginalParameterTitleText.text = "原文 (Key) - [0项]";
+        OriginalTitleText.text = "原文 - [0项]";
+        OriginalParameterTitleText.text = "原文 - [0项]";
     };
 
     ClearCustomDictionary.onClick = function() {
@@ -560,13 +583,6 @@ function cleanKey(rawStr) {
     return temp.replace(/"/g, "").replace(/^\s+|\s+$/g, "");
 }
 
-function cleanValue(rawStr) {
-    if (!rawStr) return "";
-    var temp = rawStr;
-    if (temp.indexOf(":") !== -1) temp = temp.substring(temp.indexOf(":") + 1);
-    return temp.replace(/"/g, "").replace(/^\s+|\s+$/g, "");
-}
-
 function uniqueArray(arr) {
     var seen = {};
     var out = [];
@@ -579,74 +595,40 @@ function uniqueArray(arr) {
 
 // ================= 版本控制与更新日志逻辑 =================
 
-/**
- * 获取对应版本的更新说明文案
- * 你可以在这里添加未来版本的更新内容
- */
 function Zayu_GetUpdateMessage(version) {
     switch (version) {
-        case "0.0.3":
-            return "1. 新增教程视频按钮。\n" + 
-                   "2. 优化合并逻辑：采用正则匹配，解决部分电脑合并出现乱码的问题。\n" + 
-                   "3. 优化去重逻辑：不再产生空行。";
-            
-        default:
-            return "常规优化与修复，感谢您的使用！";
+        case "0.0.4":
+            return "1. 修复：合并文件时出现乱码 { : , } 的严重Bug。\n" + 
+                   "2. 优化：去重功能现在会自动移除空行。\n" + 
+                   "3. 优化：合并逻辑现在完全基于“翻译编辑框”，忽略“原文编辑框”。";
+        default: return "修复了一些已知问题。";
     }
 }
 
-/**
- * 检查版本号并处理日志文件
- * 逻辑：读取 log 最后一行 -> 对比 -> 不一致则弹窗并追加写入
- */
 function Zayu_CheckVersionAndShowLog() {
     var logFile = new File(FILE_VERSION_LOG);
     var lastRecordedVersion = "";
-
-    // 1. 读取现有的日志文件最后一行
-    if (logFile.exists) {
-        if (logFile.open("r")) {
-            logFile.encoding = "UTF-8";
-            while (!logFile.eof) {
-                var line = logFile.readln();
-                // 忽略空行，只要有内容的最后一行
-                if (line && line.replace(/\s/g, "") !== "") {
-                    lastRecordedVersion = line;
-                }
-            }
-            logFile.close();
+    if (logFile.exists && logFile.open("r")) {
+        logFile.encoding = "UTF-8";
+        while (!logFile.eof) {
+            var line = logFile.readln();
+            if (line && line.replace(/\s/g, "") !== "") lastRecordedVersion = line;
         }
+        logFile.close();
     }
-
-    // 2. 比对版本号
-    // 如果记录的版本 不等于 当前 APP_VERSION (或者文件不存在/为空)
     if (lastRecordedVersion !== APP_VERSION) {
-        
-        // A. 获取更新文案并弹窗
         var updateMsg = Zayu_GetUpdateMessage(APP_VERSION);
         alert("【插件已更新 - v" + APP_VERSION + "】\n\n" + updateMsg);
-
-        // B. 写入新版本号到日志文件 (追加模式)
         var folder = new Folder(DIR_PATH);
         if (!folder.exists) folder.create();
-
         try {
-            // 如果文件存在，使用 'e' (edit) 模式并移动指针到末尾实现追加
-            // 如果文件不存在，使用 'w' (write) 模式创建
             var mode = logFile.exists ? "e" : "w";
-            
             if (logFile.open(mode)) {
                 logFile.encoding = "UTF-8";
-                if (mode === "e") {
-                    logFile.seek(0, 2); // 移动指针到文件末尾
-                }
-                // 写入当前版本号并换行
+                if (mode === "e") logFile.seek(0, 2);
                 logFile.writeln(APP_VERSION); 
                 logFile.close();
             }
-        } catch (e) {
-            // 写入失败通常是权限问题，这里可以选择忽略或打印错误，不应该阻断脚本运行
-            // alert("无法写入版本日志: " + e.toString()); 
-        }
+        } catch (e) { }
     }
 }
