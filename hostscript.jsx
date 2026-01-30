@@ -67,7 +67,7 @@ function Zayu_ShowCustomDictWindow() {
         spacer.alignment = ["fill", "fill"];
 
     // 5. 右侧：版本号
-    var VersionText = ImportAndExportGroup.add("statictext", undefined, "v" + APP_VERSION);
+    var VersionText = ImportAndExportGroup.add("statictext", undefined, "Version: " + APP_VERSION);
         var g = VersionText.graphics;
         try {
             g.foregroundColor = g.newPen(g.PenType.SOLID_COLOR, [0, 1, 0, 1], 1);
