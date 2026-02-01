@@ -1,7 +1,7 @@
 // hostscript.jsx
 
 // ================= 全局配置 =================
-var APP_VERSION = "0.0.6"; // 版本号更新
+var APP_VERSION = "0.0.7"; // 版本号更新
 var DIR_PATH = "C:\\Users\\Public\\Zayu_Hook_Translation\\";
 
 // 自定义文件
@@ -561,7 +561,7 @@ function Zayu_ShowCustomDictWindow() {
 }
 
 // =========================================================
-// 最终修正版：字典编辑器
+// 修复版：字典编辑器 - 支持搜索状态下删除条目
 // =========================================================
 function Zayu_OpenEditorWindow() {
 
@@ -574,6 +574,10 @@ function Zayu_OpenEditorWindow() {
     var MasterDataName = {};
     var MasterDataParam = {};
     var currentSearchKeyword = ""; 
+    
+    // 【新增】追踪当前搜索结果中显示的 keys
+    var visibleKeysName = {};
+    var visibleKeysParam = {};
 
     // --- 2. 工具函数 ---
     function internalReadJson(path) {
@@ -588,37 +592,36 @@ function Zayu_OpenEditorWindow() {
         return {};
     }
 
-    function renderText(dataObj, keyword) {
+    // 【修改】renderText 现在会返回并记录当前可见的 keys
+    function renderText(dataObj, keyword, visibleKeysRef) {
         var lines = [];
         keyword = keyword ? keyword.toLowerCase() : "";
+        
+        // 清空并重建可见 keys 记录
+        for (var k in visibleKeysRef) delete visibleKeysRef[k];
         for (var key in dataObj) {
             if (dataObj.hasOwnProperty(key)) {
                 var val = dataObj[key];
                 if (keyword === "" || 
                     key.toLowerCase().indexOf(keyword) !== -1 || 
                     String(val).toLowerCase().indexOf(keyword) !== -1) {
-                    // 这里不做转义，直接显示给用户编辑
                     lines.push('"' + key + '" : "' + val + '"');
+                    visibleKeysRef[key] = true; // 记录这个 key 当前是可见的
                 }
             }
         }
         return lines.join("\n");
     }
 
-    // 【修复】同步逻辑：增强正则 + 兼容换行符
-    function syncText(textStr, dataObj, isSearching) {
+    // 【核心修改】syncText - 支持搜索状态下删除
+    function syncText(textStr, dataObj, visibleKeysRef, isSearching) {
         if (!textStr) textStr = "";
         
-        // 1. 兼容所有平台的换行符
         var lines = textStr.split(/[\r\n]+/);
-        
-        // 2. 正则优化：
-        // 允许冒号周围有空格
-        // 允许 Value 的引号后面跟逗号或空格
         var REGEX = /^\s*"(.+?)"\s*:\s*"(.*?)"[\s,]*$/; 
-        
-        var currentKeys = {};
+        var currentKeys = {}; // 当前编辑框中存在的 keys
 
+        // 第一遍：解析编辑框内容，更新数据
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
             if (line.replace(/\s/g, "") === "") continue;
@@ -630,10 +633,23 @@ function Zayu_OpenEditorWindow() {
             }
         }
 
+        // 第二遍：处理删除
         if (!isSearching) {
+            // 非搜索模式：删除所有不在编辑框中的 key
             for (var dbKey in dataObj) {
                 if (dataObj.hasOwnProperty(dbKey) && !currentKeys[dbKey]) {
                     delete dataObj[dbKey];
+                }
+            }
+        } else {
+            // 【关键修复】搜索模式：只删除"原本在搜索结果中显示，但现在被用户删掉"的 key
+            for (var visibleKey in visibleKeysRef) {
+                if (visibleKeysRef.hasOwnProperty(visibleKey)) {
+                    // 如果这个 key 原本在搜索结果中可见，但现在编辑框里没有了
+                    if (!currentKeys[visibleKey]) {
+                        delete dataObj[visibleKey]; // 从主数据中删除
+                        delete visibleKeysRef[visibleKey]; // 从可见记录中也删除
+                    }
                 }
             }
         }
@@ -643,11 +659,10 @@ function Zayu_OpenEditorWindow() {
     MasterDataName = internalReadJson(_FILE_NAME);
     MasterDataParam = internalReadJson(_FILE_PARAM);
 
-    // 预先生成初始文本
-    var initialTextName = renderText(MasterDataName, "");
-    var initialTextParam = renderText(MasterDataParam, "");
+    // 预先生成初始文本（同时初始化 visibleKeys）
+    var initialTextName = renderText(MasterDataName, "", visibleKeysName);
+    var initialTextParam = renderText(MasterDataParam, "", visibleKeysParam);
     
-    // 计数
     var countN = 0; for(var k in MasterDataName) countN++;
     var countP = 0; for(var k in MasterDataParam) countP++;
 
@@ -656,7 +671,7 @@ function Zayu_OpenEditorWindow() {
         win.orientation = "column"; 
         win.alignChildren = ["fill","top"]; 
         win.preferredSize = [600, 500];
-		win.maximumSize = [600, 600];
+        win.maximumSize = [600, 600];
 
     var btnSave = win.add("button", undefined, "保存所有修改 （⊙ｏ⊙）"); 
         btnSave.preferredSize.height = 40; 
@@ -671,7 +686,6 @@ function Zayu_OpenEditorWindow() {
         grpContent.alignment = ["fill","fill"]; 
         grpContent.orientation = "row"; 
         grpContent.spacing = 0;
-		
 
     var listNav = grpContent.add("listbox", undefined, ['插件名称 (' + countN + ')', '插件参数 (' + countP + ')']); 
         listNav.preferredSize.width = 150;
@@ -687,19 +701,17 @@ function Zayu_OpenEditorWindow() {
     // TAB 1
     var grpTabName = grpStack.add("group"); 
         grpTabName.orientation = "column"; 
-        grpTabName.alignment = ["fill","fill"];
-    var txtName = grpTabName.add('edittext', undefined, initialTextName, {multiline: true, scrollable: true});
-		txtName.preferredSize.height = 400;
+        grpTabName.alignment = ["fill","fill"];var txtName = grpTabName.add('edittext', undefined, initialTextName, {multiline: true, scrollable: true});
+        txtName.preferredSize.height = 400;
         txtName.alignment = ["fill","fill"];
         if(monoFont) txtName.graphics.font = monoFont;
 
     // TAB 2
     var grpTabParam = grpStack.add("group"); 
         grpTabParam.orientation = "column"; 
-        grpTabParam.alignment = ["fill","fill"];
-        grpTabParam.visible = false;
+        grpTabParam.alignment = ["fill","fill"];grpTabParam.visible = false;
     var txtParam = grpTabParam.add('edittext', undefined, initialTextParam, {multiline: true, scrollable: true});
-		txtParam.preferredSize.height = 400;
+        txtParam.preferredSize.height = 400;
         txtParam.alignment = ["fill","fill"];
         if(monoFont) txtParam.graphics.font = monoFont;
 
@@ -717,23 +729,32 @@ function Zayu_OpenEditorWindow() {
     }
     listNav.selection = 0;
 
+    // 【修改】搜索时重新渲染并更新 visibleKeys
     iptSearch.onChanging = function() {
-        syncCurrent();
+        syncCurrent(); // 先同步当前编辑框的修改
         currentSearchKeyword = this.text;
-        txtName.text = renderText(MasterDataName, currentSearchKeyword);
-        txtParam.text = renderText(MasterDataParam, currentSearchKeyword);
+        txtName.text = renderText(MasterDataName, currentSearchKeyword, visibleKeysName);
+        txtParam.text = renderText(MasterDataParam, currentSearchKeyword, visibleKeysParam);
     }
 
-    txtName.onChange = function() { syncText(this.text, MasterDataName, (currentSearchKeyword !== "")); }
-    txtParam.onChange = function() { syncText(this.text, MasterDataParam, (currentSearchKeyword !== "")); }
+    // 【修改】编辑框变化时传入 visibleKeys
+    txtName.onChange = function() { 
+        syncText(this.text, MasterDataName, visibleKeysName, (currentSearchKeyword !== "")); 
+    }
+    txtParam.onChange = function() { 
+        syncText(this.text, MasterDataParam, visibleKeysParam, (currentSearchKeyword !== "")); 
+    }
 
     function syncCurrent() {
         var isFilter = (currentSearchKeyword !== "");
-        if (grpTabName.visible) syncText(txtName.text, MasterDataName, isFilter);
-        else syncText(txtParam.text, MasterDataParam, isFilter);
+        if (grpTabName.visible) {
+            syncText(txtName.text, MasterDataName, visibleKeysName, isFilter);
+        } else {
+            syncText(txtParam.text, MasterDataParam, visibleKeysParam, isFilter);
+        }
     }
 
-    // 【核心修复】保存按钮
+    // 保存按钮
     btnSave.onClick = function() {
         syncCurrent(); 
 
@@ -744,16 +765,13 @@ function Zayu_OpenEditorWindow() {
         
         try {
             if (f1.open("w") && f2.open("w")) {
-                // !!! 这里使用自定义序列化代替 JSON.stringify !!!
                 var strName = customStringify(MasterDataName);
                 var strParam = customStringify(MasterDataParam);
-                
                 f1.write(strName);
                 f2.write(strParam);
                 f1.close(); 
                 f2.close();
                 
-                // 更新计数
                 var cN = 0; for(var k in MasterDataName) cN++;
                 var cP = 0; for(var k in MasterDataParam) cP++;
                 listNav.items[0].text = '插件名称 (' + cN + ')';
@@ -772,6 +790,7 @@ function Zayu_OpenEditorWindow() {
     win.center();
     win.show();
 }
+
 
 
 
@@ -862,6 +881,8 @@ function Zayu_ProcessImportFile(importFile, targetPath, mode) {
 // 【修复】恢复你要求的 switch 版本日志逻辑
 function Zayu_GetUpdateMessage(version) {
     switch(version) {
+		case "0.0.7":
+			return "修复了字典编辑器在搜索过滤模式下无法删除内容的问题";
         case "0.0.6":
             return "1. 新增：独立字典编辑器 (支持搜索、实时编辑、自动保存)。\n2. 优化：主界面增加实时计数显示。\n3. 修复：AE2026合并自定已汉化文件乱码问题。";
         case "0.0.5":
