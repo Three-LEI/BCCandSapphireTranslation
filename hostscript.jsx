@@ -1,7 +1,7 @@
 // hostscript.jsx
 
 // ================= 全局配置 =================
-var APP_VERSION = "0.0.7"; // 版本号更新
+var APP_VERSION = "0.0.8"; // 版本号更新
 var DIR_PATH = "C:\\Users\\Public\\Zayu_Hook_Translation\\";
 
 // 自定义文件
@@ -36,10 +36,10 @@ function Zayu_ShowCustomDictWindow() {
         ImportAndExportGroup.spacing = 10; 
     
     // 1. 左侧：导入/导出
-    var ImportDictionary = ImportAndExportGroup.add("button", undefined, "导入汉化字典"); 
+    var ImportDictionary = ImportAndExportGroup.add("button", undefined, "📥导入汉化字典"); 
         ImportDictionary.preferredSize.height = 30; 
 
-    var ExportDictionary = ImportAndExportGroup.add("button", undefined, "导出汉化字典"); 
+    var ExportDictionary = ImportAndExportGroup.add("button", undefined, "📤导出汉化字典"); 
         ExportDictionary.preferredSize.height = 30; 
 
     // 2. 分割线
@@ -49,16 +49,16 @@ function Zayu_ShowCustomDictWindow() {
 
     // 3. 左侧：清空按钮
     var ClearCustomDictionary = ImportAndExportGroup.add("button", undefined, undefined, {name: "ClearCustomDictionary"}); 
-        ClearCustomDictionary.text = "清空本地自定义字典"; 
+        ClearCustomDictionary.text = "🗑️清空本地自定义字典"; 
         ClearCustomDictionary.preferredSize.height = 30; 
         ClearCustomDictionary.helpTip = "慎用！这将删除磁盘上的两个自定义JSON文件。";
 
     // --- 打开教程视频按钮 ---
-    var OpenHelpVideoButton = ImportAndExportGroup.add("button", undefined, "使用教程视频"); 
+    var OpenHelpVideoButton = ImportAndExportGroup.add("button", undefined, "🎞️查看教程视频"); 
         OpenHelpVideoButton.preferredSize.height = 30; 
 
     // --- 【新增】打开编辑器按钮 ---
-    var OpenEditorButton = ImportAndExportGroup.add("button", undefined, "字典编辑器");
+    var OpenEditorButton = ImportAndExportGroup.add("button", undefined, "📝字典编辑器");
         OpenEditorButton.preferredSize.height = 30;
         OpenEditorButton.helpTip = "打开一个独立窗口，搜索并编辑本地字典文件";
 
@@ -97,7 +97,7 @@ function Zayu_ShowCustomDictWindow() {
         NameTranslationTeam.orientation = "column"; 
         NameTranslationTeam.alignChildren = ["left","center"]; 
         NameTranslationTeam.spacing = 5;
-    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
+    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '✅翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
         NameTranslationTitleText.preferredSize.width = 350; 
     var NameTranslationEditBox = NameTranslationTeam.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         NameTranslationEditBox.preferredSize = [350, 150]; 
@@ -125,7 +125,7 @@ function Zayu_ShowCustomDictWindow() {
         ParameterTranslationGroup.orientation = "column"; 
         ParameterTranslationGroup.alignChildren = ["left","center"]; 
         ParameterTranslationGroup.spacing = 5; 
-    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
+    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '✅翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
         ParameterTranslationTitle.preferredSize.width = 350;
     var ParameterTranslationEditBox = ParameterTranslationGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
         ParameterTranslationEditBox.preferredSize = [350, 150]; 
@@ -150,19 +150,19 @@ function Zayu_ShowCustomDictWindow() {
         Row2.alignChildren = ["fill", "center"];
         Row2.spacing = 10;
 
-    var FormatButton = Row2.add("button", undefined, "格式化编辑框文本"); 
+    var FormatButton = Row2.add("button", undefined, "编辑框文本 转 翻译格式"); 
         FormatButton.preferredSize.height = 40; 
 
-    var RemoveDupeButton = Row2.add("button", undefined, "[建议合并前使用]去除重复的汉化"); 
+    var RemoveDupeButton = Row2.add("button", undefined, "[建议保存前使用] 📚去除重复的汉化"); 
         RemoveDupeButton.preferredSize.height = 40; 
 
-    var ClearEditBoxButton = Row2.add("button", undefined, "清空上方列表"); 
+    var ClearEditBoxButton = Row2.add("button", undefined, "🧹清空上方列表"); 
         ClearEditBoxButton.preferredSize.height = 40; 
 
     var divider2 = win.add("panel", undefined, undefined, {name: "divider2"}); 
         divider2.alignment = "fill"; 
 
-    var MergeFilesButton = win.add("button", undefined, "> 合并到本地自定义汉化字典 <"); 
+    var MergeFilesButton = win.add("button", undefined, "💾 保存到本地自定义汉化字典"); 
         MergeFilesButton.preferredSize.height = 50; 
         MergeFilesButton.alignment = ["fill","center"]; 
         MergeFilesButton.graphics.font = ScriptUI.newFont("Microsoft YaHei", "BOLD", 16);
@@ -673,30 +673,92 @@ function Zayu_OpenEditorWindow() {
         win.preferredSize = [600, 500];
         win.maximumSize = [600, 600];
 
-    var btnSave = win.add("button", undefined, "保存所有修改 （⊙ｏ⊙）"); 
+    var btnSave = win.add("button", undefined, "💾保存所有修改"); 
         btnSave.preferredSize.height = 40; 
 
     var grpSearch = win.add("group"); 
         grpSearch.orientation = "row"; 
-    grpSearch.add("statictext", undefined, "搜索关键词："); 
+    grpSearch.add("statictext", undefined, "🔎搜索关键词："); 
     var iptSearch = grpSearch.add('edittext {enterKeySignalsOnChange: true}'); 
         iptSearch.alignment = ["fill", "center"]; 
+		iptSearch.preferredSize = [150, 40];
+	// 清除搜索按钮
+	var btnClearSearch = grpSearch.add("button", undefined, "🧹清除搜索");
+	
+		btnClearSearch.preferredSize.height = 40;
 
-    var grpContent = win.add("group");
-        grpContent.alignment = ["fill","fill"]; 
-        grpContent.orientation = "row"; 
-        grpContent.spacing = 0;
+	btnClearSearch.onClick = function () {
+		// 先把当前编辑框的改动同步回 MasterData（此时仍处于“搜索模式”）
+		syncCurrent();
 
-    var listNav = grpContent.add("listbox", undefined, ['插件名称 (' + countN + ')', '插件参数 (' + countP + ')']); 
-        listNav.preferredSize.width = 150;
-        listNav.alignment = ["left", "fill"]; 
+		// 清空关键词并刷新列表
+		iptSearch.text = "";
+		currentSearchKeyword = "";
+
+		txtName.text  = renderText(MasterDataName, "", visibleKeysName);
+		txtParam.text = renderText(MasterDataParam, "", visibleKeysParam);
+
+		// 可选：把光标放回搜索框
+		try { iptSearch.active = true; } catch (e) {}
+	};
+
+	var grpContent = win.add("group");
+		grpContent.alignment = ["fill","fill"];
+		grpContent.orientation = "row";
+		grpContent.spacing = 0;
+
+	// 左侧：导航 + 提示（纵向）
+	var navCol = grpContent.add("group");
+		navCol.orientation = "column";
+		navCol.alignChildren = ["fill", "top"];
+		navCol.preferredSize.width = 150;
+		navCol.alignment = ["left", "fill"];
+
+	var listNav = navCol.add("listbox", undefined, [
+		'插件名称 (' + countN + ')',
+		'插件参数 (' + countP + ')'
+	]);
+		listNav.preferredSize.width = 150;
+		listNav.alignment = ["fill", "fill"];
+
+	// 底部提示：用只读 edittext 来显示多行（可选中复制，不可编辑）
+	var navTipText =
+		"⚠️温馨提示：\n\n编辑框控件多行文本存在最大字符数限制\n\n" +
+		"参数文本太多会无法进行修改只能删除行，\n\n" +
+		"可以通过搜索你要修改的\n\n或者复制到其他文本编辑器中修改后\n\n" +
+		"再粘贴回编辑框进行保存保存💾";
+
+	var navTip = navCol.add("edittext", undefined, navTipText, {
+		multiline: true,
+		readonly: true,
+		scrollable: false,
+		scrolling: false
+	});
+	try { navTip.scrollable = false; } catch (e) {}
+	try { navTip.scrolling = false; } catch (e) {}
+	navTip.preferredSize = [150, 95];
+	navTip.helpTip = navTipText;
+
+	// 尝试设置字体/颜色（注意：edittext 的颜色在某些 AE/系统上可能不生效）
+	try {
+		navTip.graphics.font = ScriptUI.newFont("Microsoft YaHei", "REGULAR", 11);
+		navTip.graphics.foregroundColor = navTip.graphics.newPen(
+			navTip.graphics.PenType.SOLID_COLOR,
+			[0.9, 0.6, 0.1, 1], // RGBA，0~1
+			1
+		);
+	} catch (e) {}
+
+
 
     var grpStack = grpContent.add("group"); 
         grpStack.alignment = ["fill","fill"]; 
         grpStack.orientation = "stack"; 
 
-    var monoFont;
-    try { monoFont = ScriptUI.newFont("Microsoft YaHei", "REGULAR", 16); } catch(e){}
+	var EDITOR_FONT_SIZE = 20;
+	var monoFont;
+	try { monoFont = ScriptUI.newFont("Microsoft YaHei", "REGULAR", EDITOR_FONT_SIZE); } catch(e){}
+
 
     // TAB 1
     var grpTabName = grpStack.add("group"); 
@@ -716,6 +778,30 @@ function Zayu_OpenEditorWindow() {
         if(monoFont) txtParam.graphics.font = monoFont;
 
     // ================= 事件 =================
+	function countOwnKeys(obj) {
+		var n = 0;
+		for (var k in obj) if (obj.hasOwnProperty(k)) n++;
+		return n;
+	}
+
+	function refreshNavCounts() {
+		var cN = countOwnKeys(MasterDataName);
+		var cP = countOwnKeys(MasterDataParam);
+
+		// 记住当前选中项
+		var selIndex = (listNav.selection) ? listNav.selection.index : 0;
+
+		// 关键：重建 items，强制 listbox 重绘
+		listNav.removeAll();
+		listNav.add("item", "插件名称 (" + cN + ")");
+		listNav.add("item", "插件参数 (" + cP + ")");
+		listNav.selection = selIndex;
+
+		try { win.layout.layout(true); } catch (e) {}
+		try { win.update(); } catch (e) {}
+	}
+
+
     listNav.onChange = function() {
         if (!listNav.selection) return;
         syncCurrent();
@@ -772,11 +858,8 @@ function Zayu_OpenEditorWindow() {
                 f1.close(); 
                 f2.close();
                 
-                var cN = 0; for(var k in MasterDataName) cN++;
-                var cP = 0; for(var k in MasterDataParam) cP++;
-                listNav.items[0].text = '插件名称 (' + cN + ')';
-                listNav.items[1].text = '插件参数 (' + cP + ')';
-                
+                // 保存成功后刷新计数
+				refreshNavCounts();
                 alert("保存成功！");
             } else {
                 alert("无法写入文件，请检查权限。");
@@ -881,6 +964,8 @@ function Zayu_ProcessImportFile(importFile, targetPath, mode) {
 // 【修复】恢复你要求的 switch 版本日志逻辑
 function Zayu_GetUpdateMessage(version) {
     switch(version) {
+		case "0.0.8":
+			return "修改了一下UI";
 		case "0.0.7":
 			return "修复了字典编辑器在搜索过滤模式下无法删除内容的问题";
         case "0.0.6":
