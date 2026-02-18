@@ -12191,9 +12191,9 @@
 	"Ease Peak" : "缓动峰值",
 	"Ease Base" : "缓动基础",
 	"Motion Controls" : "运动控制",
-	"Finish at Orighin" : "在原点结束",
-	"Relative (deg/s)" : "相对 (度/秒)",
+	"Finish at Origin" : "在原点结束",
+	"Rotation (deg/s)" : "相对 (度/秒)",
 	"Relative Anchor" : "相对锚点",
-	"Back Side Contorls" : "背面控制",
+	"Back Side Controls" : "背面控制",
 	"FI Motion Blur Engine" : "FI运动模糊引擎"
 }
