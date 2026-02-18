@@ -12170,8 +12170,6 @@
 	"Caustics Speed" : "焦散速度",
 	"Volumetric Glow" : "体积发光",
 	"Apply Prescale" : "应用预缩放",
-	"Dou Color" : "双颜色",
-	"Dou Amount" : "双倍数量",
 	"Invert Shadow" : "反转阴影",
 	"Alpha Falloff" : "Alpha衰减",
 	"Extrude Source" : "挤出源",
@@ -12245,5 +12243,5 @@
 	"Scale Falloff" : "缩放衰减",
 	"Prevent Jitter" : "防止抖动",
 	"Duo Color" : "双色",
-	"Dou Amount" : "双倍数量"
+	"Duo Amount" : "双倍数量"
 }
