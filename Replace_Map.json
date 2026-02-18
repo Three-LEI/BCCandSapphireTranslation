@@ -12257,5 +12257,11 @@
 	"Scale Falloff Speed" : "缩放衰减速度",
 	"Alpha Falloff Initial" : "Alpha衰减初始",
 	"Alpha Falloff Speed" : "Alpha衰减速度",
-	"Target Rotation" : "目标旋转"
+	"Target Rotation" : "目标旋转",
+	"Hor. Spacing Target" : "水平间距目标",
+	"Ver. Spacing Target" : "垂直间距目标",
+	"Hor. Shift Target" : "水平偏移目标",
+	"Ver. Shift Target" : "垂直偏移目标",
+	"Scale Falloff Target" : "缩放衰减目标",
+	"Alpha Falloff Target" : "Alpha衰减目标"
 }
