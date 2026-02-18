@@ -12243,5 +12243,19 @@
 	"Scale Falloff" : "缩放衰减",
 	"Prevent Jitter" : "防止抖动",
 	"Duo Color" : "双色",
-	"Duo Amount" : "双倍数量"
+	"Duo Amount" : "双倍数量",
+	"Reverse Animation" : "反转动画",
+	"Hor. Spacing Initial" : "水平间距初始",
+	"Hor. Spacing Speed" : "水平间距速度",
+	"Ver. Spacing Initial" : "垂直间距初始",
+	"Ver. Spacing Speed" : "垂直间距速度",
+	"Hor. Shift Initial" : "水平偏移初始",
+	"Hor. Shift Speed" : "水平偏移速度",
+	"Ver. Shift Initial" : "垂直偏移初始",
+	"Ver. Shift Speed" : "垂直偏移速度",
+	"Scale Falloff Initial" : "缩放衰减初始",
+	"Scale Falloff Speed" : "缩放衰减速度",
+	"Alpha Falloff Initial" : "Alpha衰减初始",
+	"Alpha Falloff Speed" : "Alpha衰减速度",
+	"Target Rotation" : "目标旋转"
 }
