@@ -1,7 +1,7 @@
 // hostscript.jsx
 
 // ================= 全局配置 =================
-var APP_VERSION = "0.0.8"; // 版本号更新
+var APP_VERSION = "0.0.9"; // 版本号更新
 var DIR_PATH = "C:\\Users\\Public\\Zayu_Hook_Translation\\";
 
 // 自定义文件
@@ -16,10 +16,254 @@ var OFFICIAL_PARAM_DICT = DIR_PATH + "Replace_Map.json";
 // 版本日志
 var FILE_VERSION_LOG = DIR_PATH + "VERSION.log";
 
+// ================= json2.js JSON 兼容补丁 ================
+if (typeof JSON !== "object") {
+    JSON = {};
+}
+
+(function () {
+    "use strict";
+
+    var rx_one = /^[\],:{}\s]*$/;
+    var rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g;
+    var rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g;
+    var rx_four = /(?:^|:|,)(?:\s*\[)+/g;
+    var rx_escapable = /[\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+    var rx_dangerous = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+
+    function f(n) {
+        return (n < 10) ? "0" + n : n;
+    }
+
+    function this_value() {
+        return this.valueOf();
+    }
+
+    if (typeof Date.prototype.toJSON !== "function") {
+        Date.prototype.toJSON = function () {
+            return isFinite(this.valueOf())
+                ? (
+                    this.getUTCFullYear()
+                    + "-"
+                    + f(this.getUTCMonth() + 1)
+                    + "-"
+                    + f(this.getUTCDate())
+                    + "T"
+                    + f(this.getUTCHours())
+                    + ":"
+                    + f(this.getUTCMinutes())
+                    + ":"
+                    + f(this.getUTCSeconds())
+                    + "Z"
+                )
+                : null;
+        };
+        Boolean.prototype.toJSON = this_value;
+        Number.prototype.toJSON = this_value;
+        String.prototype.toJSON = this_value;
+    }
+
+    var gap;
+    var indent;
+    var meta;
+    var rep;
+
+    function quote(string) {
+        rx_escapable.lastIndex = 0;
+        return rx_escapable.test(string)
+            ? "\"" + string.replace(rx_escapable, function (a) {
+                var c = meta[a];
+                return typeof c === "string"
+                    ? c
+                    : "\\u" + ("0000" + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + "\""
+            : "\"" + string + "\"";
+    }
+
+    function str(key, holder) {
+        var i; var k; var v; var length;
+        var mind = gap;
+        var partial;
+        var value = holder[key];
+
+        if (value && typeof value === "object" && typeof value.toJSON === "function") {
+            value = value.toJSON(key);
+        }
+
+        if (typeof rep === "function") {
+            value = rep.call(holder, key, value);
+        }
+
+        switch (typeof value) {
+            case "string":
+                return quote(value);
+            case "number":
+                return isFinite(value) ? String(value) : "null";
+            case "boolean":
+            case "null":
+                return String(value);
+            case "object":
+                if (!value) {
+                    return "null";
+                }
+                gap += indent;
+                partial = [];
+
+                if (Object.prototype.toString.apply(value) === "[object Array]") {
+                    length = value.length;
+                    for (i = 0; i < length; i += 1) {
+                        partial[i] = str(i, value) || "null";
+                    }
+                    v = partial.length === 0
+                        ? "[]"
+                        : gap
+                            ? ("[\n" + gap + partial.join(",\n" + gap) + "\n" + mind + "]")
+                            : "[" + partial.join(",") + "]";
+                    gap = mind;
+                    return v;
+                }
+
+                if (rep && typeof rep === "object") {
+                    length = rep.length;
+                    for (i = 0; i < length; i += 1) {
+                        if (typeof rep[i] === "string") {
+                            k = rep[i];
+                            v = str(k, value);
+                            if (v) {
+                                partial.push(quote(k) + ((gap) ? ": " : ":") + v);
+                            }
+                        }
+                    }
+                } else {
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = str(k, value);
+                            if (v) {
+                                partial.push(quote(k) + ((gap) ? ": " : ":") + v);
+                            }
+                        }
+                    }
+                }
+                v = partial.length === 0
+                    ? "{}"
+                    : gap
+                        ? "{\n" + gap + partial.join(",\n" + gap) + "\n" + mind + "}"
+                        : "{" + partial.join(",") + "}";
+                gap = mind;
+                return v;
+        }
+    }
+
+    if (typeof JSON.stringify !== "function") {
+        meta = {
+            "\b": "\\b",
+            "\t": "\\t",
+            "\n": "\\n",
+            "\f": "\\f",
+            "\r": "\\r",
+            "\"": "\\\"",
+            "\\": "\\\\"
+        };
+        JSON.stringify = function (value, replacer, space) {
+            var i;
+            gap = "";
+            indent = "";
+
+            if (typeof space === "number") {
+                for (i = 0; i < space; i += 1) {
+                    indent += " ";
+                }
+            } else if (typeof space === "string") {
+                indent = space;
+            }
+
+            rep = replacer;
+            if (replacer && typeof replacer !== "function" && (typeof replacer !== "object" || typeof replacer.length !== "number")) {
+                throw new Error("JSON.stringify");
+            }
+
+            return str("", { "": value });
+        };
+    }
+
+    if (typeof JSON.parse !== "function") {
+        JSON.parse = function (text, reviver) {
+            var j;
+
+            function walk(holder, key) {
+                var k; var v;
+                var value = holder[key];
+                if (value && typeof value === "object") {
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+            text = String(text);
+            rx_dangerous.lastIndex = 0;
+            if (rx_dangerous.test(text)) {
+                text = text.replace(rx_dangerous, function (a) {
+                    return "\\u" + ("0000" + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+            if (
+                rx_one.test(
+                    text
+                        .replace(rx_two, "@")
+                        .replace(rx_three, "]")
+                        .replace(rx_four, "")
+                )
+            ) {
+                j = eval("(" + text + ")");
+
+                return typeof reviver === "function"
+                    ? walk({ "": j }, "")
+                    : j;
+            }
+
+            throw new SyntaxError("JSON.parse");
+        };
+    }
+}());
+
+// ------------- 新增：确保目录和字典文件存在，首次运行自动创建空文件 -------------
+function ensureDirAndFileExist() {
+    var folder = new Folder(DIR_PATH);
+    if (!folder.exists) {
+        if (!folder.create()) {
+            alert("无法创建字典文件夹，可能没有权限，路径：" + DIR_PATH);
+            return false;
+        }
+    }
+    var fileNames = [FILE_NAME_DICT, FILE_PARAM_DICT];
+    for (var i=0; i<fileNames.length; i++) {
+        var f = new File(fileNames[i]);
+        if (!f.exists) {
+            // 写入一个空 JSON 对象文件，避免后续读取失败
+            safeWriteFile(fileNames[i], "{}");
+        }
+    }
+    return true;
+}
+
 function Zayu_ShowCustomDictWindow() {
     // 启动时检查版本日志
     Zayu_CheckVersionAndShowLog();
-    
+        // 新增：确保文件夹和字典文件存在，失败则终止UI创建
+    if (!ensureDirAndFileExist()) {
+        alert("无法启动插件，因为字典文件夹或文件不可用。");
+        return; // 阻止后续UI初始化，避免空读写覆盖文件
+    }
     // ================= UI 构建区域 =================
     var win = new Window("palette"); 
         win.text = "杂鱼-自定义汉化字典"; 
@@ -521,9 +765,17 @@ function Zayu_ShowCustomDictWindow() {
 		}
 
 		var localNameDict = readJsonFile(FILE_NAME_DICT); 
+		if (localNameDict === null) {
+			alert("【错误】插件名字典读取失败，无法保存！");
+			return;
+		}
 		var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
 
 		var localParamDict = readJsonFile(FILE_PARAM_DICT); 
+		if (localParamDict === null) {
+			alert("【错误】插件参数字典读取失败，无法保存！");
+			return;
+		}
 		var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
 
 		if (countName === 0 && countParam === 0) {
@@ -964,6 +1216,8 @@ function Zayu_ProcessImportFile(importFile, targetPath, mode) {
 // 【修复】恢复你要求的 switch 版本日志逻辑
 function Zayu_GetUpdateMessage(version) {
     switch(version) {
+		case "0.0.9":
+			return "修复了部分电脑AE无法读取自定义汉化字典导致清空之前的翻译问题！";
 		case "0.0.8":
 			return "修改了一下UI";
 		case "0.0.7":
@@ -1012,17 +1266,38 @@ function safeWriteFile(filePath, content) {
     if (!folder.exists) folder.create();
     var file = new File(filePath);
     file.encoding = "UTF-8";
-    return file.open("w") ? (file.write(content), file.close(), true) : false;
+    if (!file.open("w")) {
+        alert("【错误】无法写入文件，可能权限不足或文件被占用：\n" + filePath);
+        return false;
+    }
+    file.write(content);
+    file.close();
+    return true;
 }
+
 function readJsonFile(filePath) {
     var file = new File(filePath);
-    if (file.exists && file.open("r")) {
-        file.encoding = "UTF-8";
-        var str = file.read(); file.close();
-        try { return JSON.parse(str); } catch(e) { return {}; }
+    if (file.exists) {
+        if (file.open("r")) {
+            file.encoding = "UTF-8";
+            var str = file.read();
+            file.close();
+            try {
+                return JSON.parse(str);
+            } catch(e) {
+                alert("【错误】解析 JSON 文件失败：\n" + filePath + "\n错误信息：" + e.toString());
+                return null;  // 明确返回null
+            }
+        } else {
+            alert("【错误】打开文件失败（权限?被占用?):\n" + filePath);
+            return null;
+        }
+    } else {
+        alert("【警告】文件不存在:\n" + filePath);
+        return null;
     }
-    return {};
 }
+
 function cleanKey(rawStr) {
     if (!rawStr) return "";
     var temp = rawStr.split(":")[0]; 
