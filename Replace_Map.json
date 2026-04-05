@@ -12249,5 +12249,16 @@
 	"CrosshatchPencil" : "交叉排线铅笔",
 	"CrosshatchChalk" : "交叉排线粉笔",
 	"Stroke Color" : "描边颜色",
-	"Solid Color" : "纯色"
+	"Solid Color" : "纯色",
+	"Update Available!" : "有可用更新！",
+	"Get 1-Days Free Access" : "杂鱼汉化-淚泪泪",
+	"Preserve Blue" : "保留蓝色",
+	"Transition Timing" : "过渡时间",
+	"Dissolve Time" : "溶解时间",
+	"Dissolve Center" : "溶解中心",
+	"Continuous Motion Control" : "连续运动控制",
+	"Temporal Motion Control:" : "时间运动控制：",
+	"Horizontal Tilt" : "水平倾斜",
+	"Vertical Tilt" : "垂直倾斜",
+	"Reset To Zero" : "重置为零"
 }
