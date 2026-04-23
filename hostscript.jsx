@@ -1,7 +1,7 @@
 // hostscript.jsx
 
 // ================= 全局配置 =================
-var APP_VERSION = "0.0.9"; // 版本号更新
+var APP_VERSION = "0.1.0"; // 版本号更新
 var DIR_PATH = "C:\\Users\\Public\\Zayu_Hook_Translation\\";
 
 // 自定义文件
@@ -280,10 +280,10 @@ function Zayu_ShowCustomDictWindow() {
         ImportAndExportGroup.spacing = 10; 
     
     // 1. 左侧：导入/导出
-    var ImportDictionary = ImportAndExportGroup.add("button", undefined, "📥导入汉化字典"); 
+    var ImportDictionary = ImportAndExportGroup.add("button", undefined, "导入汉化字典"); 
         ImportDictionary.preferredSize.height = 30; 
 
-    var ExportDictionary = ImportAndExportGroup.add("button", undefined, "📤导出汉化字典"); 
+    var ExportDictionary = ImportAndExportGroup.add("button", undefined, "导出汉化字典"); 
         ExportDictionary.preferredSize.height = 30; 
 
     // 2. 分割线
@@ -293,16 +293,16 @@ function Zayu_ShowCustomDictWindow() {
 
     // 3. 左侧：清空按钮
     var ClearCustomDictionary = ImportAndExportGroup.add("button", undefined, undefined, {name: "ClearCustomDictionary"}); 
-        ClearCustomDictionary.text = "🗑️清空本地自定义字典"; 
+        ClearCustomDictionary.text = "清空本地自定义字典"; 
         ClearCustomDictionary.preferredSize.height = 30; 
         ClearCustomDictionary.helpTip = "慎用！这将删除磁盘上的两个自定义JSON文件。";
 
     // --- 打开教程视频按钮 ---
-    var OpenHelpVideoButton = ImportAndExportGroup.add("button", undefined, "🎞️查看教程视频"); 
+    var OpenHelpVideoButton = ImportAndExportGroup.add("button", undefined, "查看教程视频"); 
         OpenHelpVideoButton.preferredSize.height = 30; 
 
     // --- 【新增】打开编辑器按钮 ---
-    var OpenEditorButton = ImportAndExportGroup.add("button", undefined, "📝字典编辑器");
+    var OpenEditorButton = ImportAndExportGroup.add("button", undefined, "字典编辑器");
         OpenEditorButton.preferredSize.height = 30;
         OpenEditorButton.helpTip = "打开一个独立窗口，搜索并编辑本地字典文件";
 
@@ -321,58 +321,26 @@ function Zayu_ShowCustomDictWindow() {
     // --- 插件名称区 ---
     var PluginNameArea = win.add("panel", undefined, undefined, {name: "PluginNameArea"}); 
         PluginNameArea.text = "插件名称区 (Name)"; 
-        PluginNameArea.orientation = "row"; 
+        PluginNameArea.orientation = "column"; // 改为垂直排列
+        PluginNameArea.alignChildren = ["fill", "top"]; // 横向填满
         PluginNameArea.spacing = 10; 
         PluginNameArea.margins = 10; 
 
-    // 插件名-原文
-    var OriginalNameGroup = PluginNameArea.add("group", undefined, {name: "OriginalNameGroup"}); 
-        OriginalNameGroup.orientation = "column"; 
-        OriginalNameGroup.alignChildren = ["left","center"]; 
-        OriginalNameGroup.spacing = 5;
-    
-    var OriginalTitleText = OriginalNameGroup.add("statictext", undefined, "提取或自己输入的原文 - [0项]"); 
-        OriginalTitleText.preferredSize.width = 350; 
-    var NameOriginalTextEditingBox = OriginalNameGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        NameOriginalTextEditingBox.preferredSize = [350, 150]; 
-
-    // 插件名-翻译
-    var NameTranslationTeam = PluginNameArea.add("group", undefined, {name: "NameTranslationTeam"}); 
-        NameTranslationTeam.orientation = "column"; 
-        NameTranslationTeam.alignChildren = ["left","center"]; 
-        NameTranslationTeam.spacing = 5;
-    var NameTranslationTitleText = NameTranslationTeam.add("statictext", undefined, '✅翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
-        NameTranslationTitleText.preferredSize.width = 350; 
-    var NameTranslationEditBox = NameTranslationTeam.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        NameTranslationEditBox.preferredSize = [350, 150]; 
+    var NameTranslationTitleText = PluginNameArea.add("statictext", undefined, '插件名翻译 (格式：英文=翻译) - [0项]'); 
+    var NameTranslationEditBox = PluginNameArea.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
+        NameTranslationEditBox.preferredSize = [-1, 150]; // 宽度-1代表自动拉伸填满
 
     // --- 插件参数区 ---
     var PluginParameterArea = win.add("panel", undefined, undefined, {name: "PluginParameterArea"}); 
         PluginParameterArea.text = "插件参数区 (Parameter)"; 
-        PluginParameterArea.orientation = "row"; 
+        PluginParameterArea.orientation = "column"; // 改为垂直排列
+        PluginParameterArea.alignChildren = ["fill", "top"]; // 横向填满
         PluginParameterArea.spacing = 10; 
         PluginParameterArea.margins = 10; 
 
-    // 参数-原文
-    var ParameterOriginalTextGroup = PluginParameterArea.add("group", undefined, {name: "ParameterOriginalTextGroup"}); 
-        ParameterOriginalTextGroup.orientation = "column"; 
-        ParameterOriginalTextGroup.alignChildren = ["left","center"]; 
-        ParameterOriginalTextGroup.spacing = 5; 
-    
-    var OriginalParameterTitleText = ParameterOriginalTextGroup.add("statictext", undefined, "提取或自己输入的原文 - [0项]"); 
-        OriginalParameterTitleText.preferredSize.width = 350;
-    var ParameterTextEditingBox = ParameterOriginalTextGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        ParameterTextEditingBox.preferredSize = [350, 150]; 
-
-    // 参数-翻译
-    var ParameterTranslationGroup = PluginParameterArea.add("group", undefined, {name: "ParameterTranslationGroup"}); 
-        ParameterTranslationGroup.orientation = "column"; 
-        ParameterTranslationGroup.alignChildren = ["left","center"]; 
-        ParameterTranslationGroup.spacing = 5; 
-    var ParameterTranslationTitle = ParameterTranslationGroup.add("statictext", undefined, '✅翻译 - 最终导出的内容 严格按照"英文" : "翻译"格式'); 
-        ParameterTranslationTitle.preferredSize.width = 350;
-    var ParameterTranslationEditBox = ParameterTranslationGroup.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
-        ParameterTranslationEditBox.preferredSize = [350, 150]; 
+    var ParameterTranslationTitle = PluginParameterArea.add("statictext", undefined, '参数名翻译 (格式：英文=翻译) - [0项]'); 
+    var ParameterTranslationEditBox = PluginParameterArea.add('edittext {properties: {multiline: true, scrollable: true, wantReturn: true}}'); 
+        ParameterTranslationEditBox.preferredSize = [-1, 150]; 
 
     // --- 底部功能区 ---
     var BottomFunctionGroup = win.add("group", undefined, {name: "BottomFunctionGroup"}); 
@@ -397,16 +365,16 @@ function Zayu_ShowCustomDictWindow() {
     var FormatButton = Row2.add("button", undefined, "编辑框文本 转 翻译格式"); 
         FormatButton.preferredSize.height = 40; 
 
-    var RemoveDupeButton = Row2.add("button", undefined, "[建议保存前使用] 📚去除重复的汉化"); 
+    var RemoveDupeButton = Row2.add("button", undefined, "[建议保存前使用] 去除重复的汉化"); 
         RemoveDupeButton.preferredSize.height = 40; 
 
-    var ClearEditBoxButton = Row2.add("button", undefined, "🧹清空上方列表"); 
+    var ClearEditBoxButton = Row2.add("button", undefined, "清空上方列表"); 
         ClearEditBoxButton.preferredSize.height = 40; 
 
     var divider2 = win.add("panel", undefined, undefined, {name: "divider2"}); 
         divider2.alignment = "fill"; 
 
-    var MergeFilesButton = win.add("button", undefined, "💾 保存到本地自定义汉化字典"); 
+    var MergeFilesButton = win.add("button", undefined, "保存到本地自定义汉化字典"); 
         MergeFilesButton.preferredSize.height = 50; 
         MergeFilesButton.alignment = ["fill","center"]; 
         MergeFilesButton.graphics.font = ScriptUI.newFont("Microsoft YaHei", "BOLD", 16);
@@ -424,32 +392,27 @@ function Zayu_ShowCustomDictWindow() {
     // 辅助：更新列表项数显示
     function updateCountsLabel() {
         var countN = 0;
-        if(NameOriginalTextEditingBox.text) {
-             var lines = NameOriginalTextEditingBox.text.split("\n");
+        if(NameTranslationEditBox.text) {
+             var lines = NameTranslationEditBox.text.split("\n");
              for(var i=0; i<lines.length; i++) if(lines[i].replace(/\s/g, "") !== "") countN++;
         }
-        OriginalTitleText.text = "提取或自己输入的原文 - [" + countN + "项]";
+        NameTranslationTitleText.text = "插件名翻译 (格式：英文=翻译) - [" + countN + "项]";
 
         var countP = 0;
-        if(ParameterTextEditingBox.text) {
-             var lines = ParameterTextEditingBox.text.split("\n");
+        if(ParameterTranslationEditBox.text) {
+             var lines = ParameterTranslationEditBox.text.split("\n");
              for(var i=0; i<lines.length; i++) if(lines[i].replace(/\s/g, "") !== "") countP++;
         }
-        OriginalParameterTitleText.text = "提取或自己输入的原文 - [" + countP + "项]";
+        ParameterTranslationTitle.text = "参数名翻译 (格式：英文=翻译) - [" + countP + "项]";
     }
 	
-	// ===========================================
-    // 【新增】实时监听编辑框变化
-    // ===========================================
-    
-    // 1. 监听原文名称框 (打字时实时更新)
-    NameOriginalTextEditingBox.onChanging = updateCountsLabel;
-    // 监听粘贴或失去焦点 (双重保险)
-    NameOriginalTextEditingBox.onChange = updateCountsLabel;
+    // 1. 监听插件名框 (打字时实时更新)
+    NameTranslationEditBox.onChanging = updateCountsLabel;
+    NameTranslationEditBox.onChange = updateCountsLabel;
 
-    // 2. 监听原文参数框
-    ParameterTextEditingBox.onChanging = updateCountsLabel;
-    ParameterTextEditingBox.onChange = updateCountsLabel;
+    // 2. 监听参数框
+    ParameterTranslationEditBox.onChanging = updateCountsLabel;
+    ParameterTranslationEditBox.onChange = updateCountsLabel;
 
     // ===========================================
 
@@ -481,9 +444,7 @@ function Zayu_ShowCustomDictWindow() {
             return;
         }
 
-        NameOriginalTextEditingBox.text = "";
         NameTranslationEditBox.text = ""; 
-        ParameterTextEditingBox.text = "";
         ParameterTranslationEditBox.text = ""; 
         
         var pluginNames = [];
@@ -514,66 +475,58 @@ function Zayu_ShowCustomDictWindow() {
 
         var nameStr = "";
         for (var n = 0; n < pluginNames.length; n++) {
-            nameStr += '"' + pluginNames[n] + '" : ""\n';
+            nameStr += pluginNames[n] + '=\n';
         }
-        NameOriginalTextEditingBox.text = nameStr;
+        NameTranslationEditBox.text = nameStr; // 直接放入翻译框
 
         var paramStr = "";
         for (var p = 0; p < params.length; p++) {
-            paramStr += '"' + params[p] + '" : ""\n';
+            paramStr += params[p] + '=\n';
         }
-        ParameterTextEditingBox.text = paramStr;
+        ParameterTranslationEditBox.text = paramStr; // 直接放入翻译框
+
         updateCountsLabel();
     };
 
     // 格式化编辑框文本
     FormatButton.onClick = function() {
-        function smartFormatBox(sourceText) {
+		function smartFormatBox(sourceText) {
             if (!sourceText || sourceText.replace(/\s/g, "") === "") return "";
-            
-            // 兼容各种换行符
             var lines = sourceText.split(/\r\n|\r|\n/);
             var resultLines = [];
             
-            // 正则：检查是否已经是标准格式 "Key" : "Val" (允许冒号周围有空格)
-            var regexFormatted = /^\s*".+?"\s*:\s*".*?"\s*$/;
+            // 匹配包含等号的情况
+            var regexHasEqual = /^[^=]+?=/;
 
             for (var i = 0; i < lines.length; i++) {
                 var line = lines[i];
-                // 跳过纯空行
                 if (line.replace(/\s/g, "") === "") continue;
 
-                // 1. 如果已经是标准格式，直接保留
-                if (regexFormatted.test(line)) {
+                if (regexHasEqual.test(line)) {
                     resultLines.push(line);
-                } 
-                // 2. 如果不是标准格式，则认为整行都是 Key
-                else {
-                    // 去除首尾空格
-                    var rawKey = line.replace(/^\s+|\s+$/g, "");
-
-                    // 【关键修改】检测并处理首尾本来就有引号的情况
-                    // 如果用户复制进来的是 "Setting: Background" (带引号)，我们去掉首尾引号，避免变成 ""...""
-                    if (rawKey.charAt(0) === '"' && rawKey.charAt(rawKey.length - 1) === '"') {
-                        rawKey = rawKey.substring(1, rawKey.length - 1);
-                    }
-
-                    // 【防错】转义 Key 内部的引号。如果参数名里本身有引号 (比如 Name "A")，需要变成 Name \"A\"
-                    rawKey = rawKey.replace(/"/g, '\\"');
-
-                    if (rawKey !== "") {
-                        // 组装成标准格式，Value 留空
-                        resultLines.push('"' + rawKey + '" : ""');
+                } else {
+                    // 如果发现旧的 "Key" : "Val" 格式，自动转换为 Key=Val
+                    var oldMatch = line.match(/^\s*"(.+?)"\s*:\s*"(.*?)"\s*$/);
+                    if (oldMatch) {
+                        resultLines.push(oldMatch[1] + "=" + oldMatch[2]);
+                    } else {
+                        // 纯单词转成 Key=
+                        var rawKey = line.replace(/^\s+|\s+$/g, "");
+                        if (rawKey.charAt(0) === '"' && rawKey.charAt(rawKey.length - 1) === '"') {
+                            rawKey = rawKey.substring(1, rawKey.length - 1);
+                        }
+                        if (rawKey !== "") {
+                            resultLines.push(rawKey + "=");
+                        }
                     }
                 }
             }
             return resultLines.join("\n");
         }
 
-        // 应用到四个输入框
-        NameOriginalTextEditingBox.text = smartFormatBox(NameOriginalTextEditingBox.text);
+
+        // 应用到两个翻译框即可
         NameTranslationEditBox.text = smartFormatBox(NameTranslationEditBox.text);
-        ParameterTextEditingBox.text = smartFormatBox(ParameterTextEditingBox.text);
         ParameterTranslationEditBox.text = smartFormatBox(ParameterTranslationEditBox.text);
         
         // 更新计数显示
@@ -583,8 +536,8 @@ function Zayu_ShowCustomDictWindow() {
 
     // 去除重复
     RemoveDupeButton.onClick = function() {
-        var nameText = NameOriginalTextEditingBox.text;
-        var paramText = ParameterTextEditingBox.text;
+        var nameText = NameTranslationEditBox.text;
+        var paramText = ParameterTranslationEditBox.text;
         var isNameEmpty = (!nameText || nameText.replace(/\s/g, "") === "");
         var isParamEmpty = (!paramText || paramText.replace(/\s/g, "") === "");
 
@@ -624,40 +577,35 @@ function Zayu_ShowCustomDictWindow() {
             progWin.update();
             $.sleep(10);
 
-            var filterContentSync = function(keyStr, valStr, dict1, dict2) {
-                if (!keyStr) return { keys: "", vals: "", removed: 0 };
-                var kLines = keyStr.split("\n");
-                var hasTranslation = (valStr && valStr.replace(/\s/g, "") !== "");
-                var vLines = hasTranslation ? valStr.split("\n") : [];
-                var resK = [], resV = [], removedCount = 0;
+            // 【新版单框去重过滤逻辑】
+            var filterContentSingle = function(textStr, dict1, dict2) {
+                if (!textStr) return { result: "", removed: 0 };
+                var lines = textStr.split("\n");
+                var resLines = [], removedCount = 0;
 
-                for (var i = 0; i < kLines.length; i++) {
-                    var lineKey = kLines[i];
-                    if (!lineKey || lineKey.replace(/\s/g, "") === "") continue;
-                    var key = cleanKey(lineKey); 
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i];
+                    if (!line || line.replace(/\s/g, "") === "") continue;
+                    
+                    var key = cleanKey(line); 
                     if (!key || key === "") continue;
+                    
+                    // 如果官方或本地已存在该Key，说明重复，将其剔除
                     if ((dict1 && dict1.hasOwnProperty(key)) || (dict2 && dict2.hasOwnProperty(key))) {
                         removedCount++;
                     } else {
-                        resK.push(lineKey);
-                        if (hasTranslation) resV.push(vLines[i] || ""); 
+                        resLines.push(line);
                     }
                 }
-                var finalValStr = (hasTranslation && resV.length > 0) ? resV.join("\n") : "";
-                return { keys: resK.join("\n"), vals: finalValStr, removed: removedCount };
+                return { result: resLines.join("\n"), removed: removedCount };
             };
 
-            var resName = filterContentSync(NameOriginalTextEditingBox.text, NameTranslationEditBox.text, zyNameDict, customNameDict);
-            var resParam = filterContentSync(ParameterTextEditingBox.text, ParameterTranslationEditBox.text, replaceMapDict, customParamDict);
+            var resName = filterContentSingle(nameText, zyNameDict, customNameDict);
+            var resParam = filterContentSingle(paramText, replaceMapDict, customParamDict);
 
-            if(!isNameEmpty) {
-                NameOriginalTextEditingBox.text = resName.keys;
-                NameTranslationEditBox.text = resName.vals;
-            }
-            if(!isParamEmpty) {
-                ParameterTextEditingBox.text = resParam.keys;
-                ParameterTranslationEditBox.text = resParam.vals;
-            }
+            if(!isNameEmpty) NameTranslationEditBox.text = resName.result;
+            if(!isParamEmpty) ParameterTranslationEditBox.text = resParam.result;
+            
             updateCountsLabel();
             resultMsg = "去重完成！\n插件名移除: " + resName.removed + "\n参数名移除: " + resParam.removed;
         } catch(err) {
@@ -740,12 +688,11 @@ function Zayu_ShowCustomDictWindow() {
 
 	// --- 6. 合并并保存 (主界面) ---
 	MergeFilesButton.onClick = function() {
-		var REGEX_LINE = /^\s*"(.+?)"\s*:\s*"(.*?)"/;
+		// 改为匹配 Key=Value 的正则
+		var REGEX_LINE = /^(.+?)=(.*)$/;
 
-		// 【兼容修复】使用正则切分行，兼容 \r 和 \n
 		function parseAndMerge(sourceText, targetDict) {
 			if (!sourceText) return 0;
-			// 关键点：兼容 Mac/Win 换行符
 			var lines = sourceText.split(/[\r\n]+/);
 			var count = 0;
 			for (var i = 0; i < lines.length; i++) {
@@ -753,33 +700,34 @@ function Zayu_ShowCustomDictWindow() {
 				if (line.replace(/\s/g, "") === "") continue;
 				var match = line.match(REGEX_LINE);
 				if (match) {
-					var key = match[1];
-					var val = match[2];
-					if (key && key.replace(/\s/g, "") !== "") {
+					// 去除 Key 和 Value 两端的多余空格
+					var key = match[1].replace(/^\s+|\s+$/g, "");
+					var val = match[2].replace(/^\s+|\s+$/g, "");
+					
+					// 【修改】：增加 val !== "" 验证，如果译文为空，直接跳过不写入
+					if (key !== "" && val !== "") {
 						targetDict[key] = val;
 						count++;
 					}
 				}
+
 			}
 			return count;
 		}
 
 		var localNameDict = readJsonFile(FILE_NAME_DICT); 
-		if (localNameDict === null) {
-			alert("【错误】插件名字典读取失败，无法保存！");
-			return;
-		}
+		if (localNameDict === null) localNameDict = {}; // 确保它是对象
+		
 		var countName = parseAndMerge(NameTranslationEditBox.text, localNameDict);
 
 		var localParamDict = readJsonFile(FILE_PARAM_DICT); 
-		if (localParamDict === null) {
-			alert("【错误】插件参数字典读取失败，无法保存！");
-			return;
-		}
+		if (localParamDict === null) localParamDict = {}; // 确保它是对象
+		
 		var countParam = parseAndMerge(ParameterTranslationEditBox.text, localParamDict);
 
+
 		if (countName === 0 && countParam === 0) {
-			alert("未检测到有效的翻译内容！\n\n请确保翻译框内的格式为：\n\"原文\" : \"翻译\"");
+			alert("未检测到有效的翻译内容！\n\n请确保翻译框内的格式为：\n原文=翻译");
 			return;
 		}
 
@@ -797,10 +745,11 @@ function Zayu_ShowCustomDictWindow() {
 	};
 
     ClearEditBoxButton.onClick = function() {
-        NameOriginalTextEditingBox.text = ""; NameTranslationEditBox.text = "";
-        ParameterTextEditingBox.text = ""; ParameterTranslationEditBox.text = "";
+        NameTranslationEditBox.text = ""; 
+        ParameterTranslationEditBox.text = "";
         updateCountsLabel();
     };
+
 
     ClearCustomDictionary.onClick = function() {
         if(confirm("确定清空本地自定义字典文件吗？")) {
@@ -925,17 +874,17 @@ function Zayu_OpenEditorWindow() {
         win.preferredSize = [600, 500];
         win.maximumSize = [600, 600];
 
-    var btnSave = win.add("button", undefined, "💾保存所有修改"); 
+    var btnSave = win.add("button", undefined, "保存所有修改"); 
         btnSave.preferredSize.height = 40; 
 
     var grpSearch = win.add("group"); 
         grpSearch.orientation = "row"; 
-    grpSearch.add("statictext", undefined, "🔎搜索关键词："); 
+    grpSearch.add("statictext", undefined, "搜索关键词："); 
     var iptSearch = grpSearch.add('edittext {enterKeySignalsOnChange: true}'); 
         iptSearch.alignment = ["fill", "center"]; 
 		iptSearch.preferredSize = [150, 40];
 	// 清除搜索按钮
-	var btnClearSearch = grpSearch.add("button", undefined, "🧹清除搜索");
+	var btnClearSearch = grpSearch.add("button", undefined, "清除搜索");
 	
 		btnClearSearch.preferredSize.height = 40;
 
@@ -975,10 +924,8 @@ function Zayu_OpenEditorWindow() {
 
 	// 底部提示：用只读 edittext 来显示多行（可选中复制，不可编辑）
 	var navTipText =
-		"⚠️温馨提示：\n\n编辑框控件多行文本存在最大字符数限制\n\n" +
-		"参数文本太多会无法进行修改只能删除行，\n\n" +
-		"可以通过搜索你要修改的\n\n或者复制到其他文本编辑器中修改后\n\n" +
-		"再粘贴回编辑框进行保存保存💾";
+		"温馨提示：\n\nAE脚本的编辑框太多翻译的时候就会有问题\n\n" +
+		"如果参数太多，可以按【Ctrl+鼠标中键】打开自定义汉化窗口，可以更加方便编辑翻译内容！" 
 
 	var navTip = navCol.add("edittext", undefined, navTipText, {
 		multiline: true,
@@ -1216,6 +1163,11 @@ function Zayu_ProcessImportFile(importFile, targetPath, mode) {
 // 【修复】恢复你要求的 switch 版本日志逻辑
 function Zayu_GetUpdateMessage(version) {
     switch(version) {
+		case "0.1.0":
+			return "！！看到这条提示的，可以下载最新的脚本安装工具，进行覆盖安装！！\n\n"+
+			"更新①：将翻译格式更改为【原文=译文】结构，具体操作可看教程视频(需下载最新的脚本安装器重新覆盖安装)\n\n"+
+			"更新②：通过快捷键【Ctrl+鼠标中键(默认)】可以打开独立的自定义汉化窗口，操作比字典编辑器更加方便，PR也支持！\n\n"+
+			"杂鱼还推出了Win系统达芬奇的蓝宝石&BCC汉化补丁，感兴趣的可以去B站主页查看哦！"
 		case "0.0.9":
 			return "修复了部分电脑AE无法读取自定义汉化字典导致清空之前的翻译问题！";
 		case "0.0.8":
@@ -1282,27 +1234,38 @@ function readJsonFile(filePath) {
             file.encoding = "UTF-8";
             var str = file.read();
             file.close();
+            
+            // 【新增】如果文件是空的，直接返回空对象
+            if (!str || str.replace(/\s/g, "") === "") {
+                return {};
+            }
+            
             try {
                 return JSON.parse(str);
             } catch(e) {
-                alert("【错误】解析 JSON 文件失败：\n" + filePath + "\n错误信息：" + e.toString());
-                return null;  // 明确返回null
+                // 【修改】解析失败时不阻断，提示后返回空对象以便重新生成
+                alert("【提示】JSON 格式已损坏或为空：\n" + filePath + "\n\n保存时将自动为您重新生成正确的结构。");
+                return {}; 
             }
         } else {
             alert("【错误】打开文件失败（权限?被占用?):\n" + filePath);
-            return null;
+            return {};
         }
     } else {
-        alert("【警告】文件不存在:\n" + filePath);
-        return null;
+        // 文件不存在时直接返回空对象
+        return {};
     }
 }
 
+
 function cleanKey(rawStr) {
     if (!rawStr) return "";
-    var temp = rawStr.split(":")[0]; 
+    // 优先尝试按等号分割，如果没有等号则兼容旧的冒号分割
+    var temp = rawStr.split("=")[0];
+    if (temp === rawStr) temp = rawStr.split(":")[0]; 
     return temp.replace(/"/g, "").replace(/^\s+|\s+$/g, "");
 }
+
 function uniqueArray(arr) {
     var seen = {}; var out = [];
     for(var i=0; i<arr.length; i++) {
