@@ -1344,5 +1344,19 @@
 	"BCC Motion Blur" : "BCC 运动模糊",
 	"BCC Linear Color Key" : "BCC 线性颜色键控",
 	"BCC Two Way Key" : "BCC 双向键控",
-	"BCC RGB Blur Dissolve" : "BCC RGB 模糊溶解"
+	"BCC RGB Blur Dissolve" : "BCC RGB 模糊溶解",
+	"BCC+Deinterlace ML" : "BCC+去隔行 ML",
+	"BCC Deinterlace OBSOLETE" : "BCC 去隔行（旧版）",
+	"BCC Displacement Map OBSOLETE" : "BCC 置换贴图（旧版）",
+	"BCC Polar Displacement OBSOLETE" : "BCC 极坐标置换（旧版）",
+	"BCC Ripple Dissolve OBSOLETE" : "BCC 波纹溶解（旧版）",
+	"BCC Ripple OBSOLETE" : "BCC 波纹（旧版）",
+	"BCC Vector Displacement OBSOLETE" : "BCC 矢量置换（旧版）",
+	"BCC+Displacement Dissolve" : "BCC+置换溶解",
+	"BCC+Lens Flare Dissolve" : "BCC+镜头光晕溶解",
+	"BCC+Ripple Dissolve" : "BCC+波纹溶解",
+	"BCC+Displacement Map" : "BCC+置换贴图",
+	"BCC+Polar Displacement" : "BCC+极坐标置换",
+	"BCC+Ripple" : "BCC+波纹",
+	"BCC+Vector Displacement" : "BCC+矢量置换"
 }
