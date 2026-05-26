@@ -1340,5 +1340,9 @@
 	"FI: Slice Impacts" : "FI: 切片冲击",
 	"FI: Split Impacts" : "FI: 分裂冲击",
 	"FI: Stretch Wipe Impacts" : "FI: 拉伸擦除冲击",
-	"FI: Wave Impacts" : "FI: 波形冲击"
+	"FI: Wave Impacts" : "FI: 波形冲击",
+	"BCC Motion Blur" : "BCC 运动模糊",
+	"BCC Linear Color Key" : "BCC 线性颜色键控",
+	"BCC Two Way Key" : "BCC 双向键控",
+	"BCC RGB Blur Dissolve" : "BCC RGB 模糊溶解"
 }
