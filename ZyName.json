@@ -1358,5 +1358,7 @@
 	"BCC+Displacement Map" : "BCC+置换贴图",
 	"BCC+Polar Displacement" : "BCC+极坐标置换",
 	"BCC+Ripple" : "BCC+波纹",
-	"BCC+Vector Displacement" : "BCC+矢量置换"
+	"BCC+Vector Displacement" : "BCC+矢量置换",
+	"S_AdvancedDefocus" : "S_高级散焦",
+	"S_TextureRidges" : "S_纹理脊线"
 }
