@@ -297,10 +297,6 @@ function Zayu_ShowCustomDictWindow() {
         ClearCustomDictionary.preferredSize.height = 30; 
         ClearCustomDictionary.helpTip = "慎用！这将删除磁盘上的两个自定义JSON文件。";
 
-    // --- 打开教程视频按钮 ---
-    var OpenHelpVideoButton = ImportAndExportGroup.add("button", undefined, "查看教程视频"); 
-        OpenHelpVideoButton.preferredSize.height = 30; 
-
     // --- 【新增】打开编辑器按钮 ---
     var OpenEditorButton = ImportAndExportGroup.add("button", undefined, "字典编辑器");
         OpenEditorButton.preferredSize.height = 30;
@@ -415,21 +411,6 @@ function Zayu_ShowCustomDictWindow() {
     ParameterTranslationEditBox.onChange = updateCountsLabel;
 
     // ===========================================
-
-    // 打开教程视频
-    OpenHelpVideoButton.onClick = function() {
-        var helpFile = new File(DIR_PATH + "help.mp4");
-        if (!helpFile.exists) {
-            alert("未找到教程视频！\n路径：" + helpFile.fsName);
-            return;
-        }
-        try {
-            var cmd = 'cmd /c start "" "' + helpFile.fsName + '"';
-            system.callSystem(cmd);
-        } catch(e) {
-            if(confirm("无法打开视频，可能是权限不足！\n是否打开首选项？")) app.executeCommand(3131); 
-        }
-    };
 
     // 读取 AE 图层逻辑
     ReadAELayerButton.onClick = function() {
@@ -1165,7 +1146,7 @@ function Zayu_GetUpdateMessage(version) {
     switch(version) {
 		case "0.1.0":
 			return "！！看到这条提示的，可以下载最新的脚本安装工具，进行覆盖安装！！\n\n"+
-			"更新①：将翻译格式更改为【原文=译文】结构，具体操作可看教程视频(需下载最新的脚本安装器重新覆盖安装)\n\n"+
+			"更新①：将翻译格式更改为【原文=译文】结构(需下载最新的脚本安装器重新覆盖安装)\n\n"+
 			"更新②：通过快捷键【Ctrl+鼠标中键(默认)】可以打开独立的自定义汉化窗口，操作比字典编辑器更加方便，PR也支持！\n\n"+
 			"杂鱼还推出了Win系统达芬奇的蓝宝石&BCC汉化补丁，感兴趣的可以去B站主页查看哦！"
 		case "0.0.9":
