@@ -238,6 +238,7 @@ if (typeof JSON !== "object") {
 
 // ------------- 新增：确保目录和字典文件存在，首次运行自动创建空文件 -------------
 function ensureDirAndFileExist() {
+    if (!Zayu_EnsureFileWritePermission()) return false;
     var folder = new Folder(DIR_PATH);
     if (!folder.exists) {
         if (!folder.create()) {
@@ -257,6 +258,7 @@ function ensureDirAndFileExist() {
 }
 
 function Zayu_ShowCustomDictWindow() {
+    if (!Zayu_EnsureFileWritePermission()) return;
     // 启动时检查版本日志
     Zayu_CheckVersionAndShowLog();
         // 新增：确保文件夹和字典文件存在，失败则终止UI创建
@@ -604,6 +606,7 @@ function Zayu_ShowCustomDictWindow() {
 
     // 导出功能
     ExportDictionary.onClick = function() {
+        if (!Zayu_EnsureFileWritePermission()) return;
         var folder = Folder.selectDialog("请选择导出文件夹");
         if (!folder) return; 
         var fName = new File(FILE_NAME_DICT);
@@ -619,6 +622,7 @@ function Zayu_ShowCustomDictWindow() {
     // 【修改】导入功能 - 支持覆盖或追加合并
     // ===========================================
     ImportDictionary.onClick = function() {
+        if (!Zayu_EnsureFileWritePermission()) return;
         // --- 第一步：处理插件名字典 (Name) ---
         alert("步骤 1/2：请选择 [" + FILE_NAME_DICT_NAME + "]");
         var fName = File.openDialog("选择 " + FILE_NAME_DICT_NAME, "*.json");
@@ -669,6 +673,7 @@ function Zayu_ShowCustomDictWindow() {
 
 	// --- 6. 合并并保存 (主界面) ---
 	MergeFilesButton.onClick = function() {
+		if (!Zayu_EnsureFileWritePermission()) return;
 		// 改为匹配 Key=Value 的正则
 		var REGEX_LINE = /^(.+?)=(.*)$/;
 
@@ -733,6 +738,7 @@ function Zayu_ShowCustomDictWindow() {
 
 
     ClearCustomDictionary.onClick = function() {
+        if (!Zayu_EnsureFileWritePermission()) return;
         if(confirm("确定清空本地自定义字典文件吗？")) {
             new File(FILE_NAME_DICT).remove(); new File(FILE_PARAM_DICT).remove();
             alert("自定义字典已清空。");
@@ -1022,6 +1028,7 @@ function Zayu_OpenEditorWindow() {
 
     // 保存按钮
     btnSave.onClick = function() {
+        if (!Zayu_EnsureFileWritePermission()) return;
         syncCurrent(); 
 
         var f1 = new File(_FILE_NAME);
@@ -1089,6 +1096,7 @@ function customStringify(obj) {
 // handles: 文件对象, 目标路径字符串, 模式("merge" or "overwrite")
 // =========================================================
 function Zayu_ProcessImportFile(importFile, targetPath, mode) {
+    if (!Zayu_EnsureFileWritePermission()) return "已取消：请先开启脚本写入文件权限";
     try {
         var targetFile = new File(targetPath);
         
@@ -1180,6 +1188,7 @@ function Zayu_CheckVersionAndShowLog() {
     
     // 如果记录的版本不等于当前代码版本，说明是新版第一次运行
     if (lastRecordedVersion !== APP_VERSION) {
+        if (!Zayu_EnsureFileWritePermission()) return;
         var msg = Zayu_GetUpdateMessage(APP_VERSION);
         alert("【插件已更新 - v" + APP_VERSION + "】\n\n" + msg);
         
@@ -1193,8 +1202,37 @@ function Zayu_CheckVersionAndShowLog() {
     }
 }
 
+// 写入前读取当前 AE 的权限设置，不自动修改首选项，也不缓存检测结果。
+function Zayu_EnsureFileWritePermission() {
+    var sections = ["Main Pref Section v2", "Main Pref Section"];
+    var key = "Pref_SCRIPTING_FILE_NETWORK_SECURITY";
+    var enabled = null;
+    var readError = "";
+    for (var i = 0; i < sections.length; i++) {
+        try {
+            if (app.preferences.havePref(sections[i], key)) {
+                enabled = (app.preferences.getPrefAsLong(sections[i], key) === 1);
+                break;
+            }
+        } catch (err) {
+            readError = String(err);
+        }
+    }
+    if (enabled === true) return true;
+    if (enabled === null) {
+        alert("无法检测当前 AE 的脚本写入权限，已停止文件操作。\n" + readError);
+    } else {
+        alert("当前 AE 未开启【允许脚本写入文件和访问网络】，已停止文件操作。\n\n" +
+            "请打开：编辑 → 首选项 → 脚本与表达式\n" +
+            "勾选【允许脚本写入文件和访问网络】并确定后，再次执行操作。\n\n" +
+            "较旧版本的 AE 中，该选项位于首选项的【常规】页面。");
+    }
+    return false;
+}
+
 // 通用工具
 function safeWriteFile(filePath, content) {
+    if (!Zayu_EnsureFileWritePermission()) return false;
     var folder = new Folder(DIR_PATH);
     if (!folder.exists) folder.create();
     var file = new File(filePath);
