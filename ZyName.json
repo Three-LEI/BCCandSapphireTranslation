@@ -1437,5 +1437,10 @@
 	"BCC+Grid" : "BCC+网格",
 	"BCC+Noise Map Studio" : "BCC+噪波贴图工作室",
 	"BCC+Waves Dissolve" : "BCC+波浪溶解",
-	"BCC+Waves" : "BCC+波浪"
+	"BCC+Waves" : "BCC+波浪",
+	"BCC+Curl" : "BCC+卷曲",
+	"BCC+Bulge" : "BCC+凸起",
+	"BCC+Vector Blur Dissolve" : "BCC+矢量模糊溶解",
+	"BCC+Curl Dissolve" : "BCC+卷曲溶解",
+	"BCC+Time Displacement" : "BCC+时间置换"
 }
